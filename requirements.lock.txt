@@ -1,0 +1,12 @@
+imbalanced-learn==0.14.2
+matplotlib==3.11.2
+numpy==2.5.3
+pandas==3.0.5
+pyarrow==25.0.1
+pytest==9.1.1
+scikit-learn==1.9.1
+scipy==1.18.1
+shap==0.52.0
+torch==2.14.0+cu126
+tqdm==4.70.1
+xgboost==3.4.1

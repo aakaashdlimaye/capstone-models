@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+models/
+logs/
+.pytest_cache/
+*.egg-info/
+
+
+results_pilot/
+reports_pilot/
+scratch/
