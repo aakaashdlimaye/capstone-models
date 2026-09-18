@@ -74,12 +74,15 @@ python run_all.py --pilot --quick  # wiring check only, a few minutes
 python run_all.py --from d         # resume from a phase
 python run_all.py --only f report  # rebuild interpretability and the report
 python run_all.py --force          # ignore cached runs and retrain
-python -m pytest tests/ -q         # 56 unit tests
+python -m pytest tests/ -q         # 71 unit tests
 ```
 
 `--pilot` writes to `results_pilot/` and `reports_pilot/`. The pilot is
 deliberately positive-enriched and **is not a reportable number** — it exists to
-catch shape and label bugs before a full run.
+catch shape and label bugs before committing to a full run. Because its numbers
+are never reported it defaults to a cheaper budget (3 seeds, 3 tuning trials)
+so the whole pipeline finishes in about half an hour; `--pilot --seeds 5
+--trials 30` runs it at the full budget.
 
 ---
 
@@ -117,12 +120,12 @@ src/
   phase_{a..g}.py  one module per phase
   leakage.py       the four-check audit
   report.py        RESULTS.md generation
-experiments/       one JSON config per phase, written by the run
+experiments/       one JSON config per run: what it was asked to do, before it ran
 results/           tables (CSV + Markdown), figures (PNG + SVG), predictions, run records
 models/            saved weights (gitignored)
 reports/           RESULTS.md, leakage_audit.md
 docs/DECISIONS.md  every judgment call, with its rationale
-tests/             56 unit tests
+tests/             71 unit tests, including the nine acceptance criteria
 ```
 
 ---
@@ -217,13 +220,85 @@ fewer windows each. Two consequences:
 
 ---
 
-## 9. Compute
+## 9. What the run found
+
+Headline numbers from the artefacts in `results/`. Every one is traceable to a
+CSV and a seed; see `reports/RESULTS.md` for the full tables.
+
+**The Transformer wins, and it is the only architecture that holds up as the
+horizon lengthens.** Test PR-AUC at h=4: Transformer 0.069 ± 0.012, CNN-LSTM-Attn
+0.044 ± 0.006, LSTM 0.039 ± 0.009, Bi-LSTM 0.035 ± 0.007, against Altman Z″'s
+0.031. Across h=1…4 the Transformer stays in 0.069–0.079 while the others decay.
+
+**A tuned XGBoost on the flattened window beats all four** (PR-AUC 0.149 at h=4).
+Reported as found. It does not touch the decomposition, which is a question about
+temporal structure and feature sets rather than a leaderboard.
+
+**The decomposition answers its question, and the answer is not the expected
+one.** At h=4, of the total movement from Altman Z″ to a full temporal model,
+**1% is coefficient drift** (+0.0010 PR-AUC, 95% CI [−0.0021, +0.0047] — not
+distinguishable from zero), **54% is the static formulation** (+0.0915, CI
+[+0.0657, +0.1254]) and **45% is the feature-set expansion moving the wrong way**
+(−0.0764, CI [−0.1088, −0.0504]). Re-estimating Altman's sixty-year-old
+coefficients on modern data buys nothing measurable; giving the same five ratios
+a time axis is what helps; and widening five ratios to twenty-nine *hurts* the
+LSTM significantly. The Transformer recovers part of that loss, so the last step
+is partly an LSTM capacity limit rather than a clean statement about features.
+The gaps survive retraining on the subset where all five Altman ratios are
+observed in all eight quarters, so they are not a missingness artefact.
+
+**The protocol audit reproduces the inflated accuracies and locates them.** The
+same LSTM, three ways at h=1: PR-AUC **0.9998** under the inflated protocol
+(random split, SMOTE before splitting), 0.9511 half-fixed, **0.0217** under the
+correct one — a **46× collapse**, 95% of it attributable to resampling before
+the split rather than to the random split itself. The diagnostic that makes the
+point concrete: the correctly-evaluated model reports **99.74% accuracy and
+loses to a constant that predicts no bankruptcy at all** (99.81%), while its
+PR-AUC is 11.6× the base rate. The same audit on UCI Polish gives PR-AUC 0.999
+inflated against 0.494 correct, and on UCI Taiwanese 0.998 against 0.319.
+
+**No training-side imbalance treatment beats a well-chosen threshold.** At h=4
+the Transformer's best expected cost at a 50:1 miss-to-false-alarm ratio comes
+from cost-sensitive thresholding on the *untreated* model (0.197, recall 0.304),
+not from class weights (0.217), SMOTE (0.222) or focal loss (0.221). SMOTE and
+focal loss both reduce the Transformer's PR-AUC (0.041 and 0.047 against 0.066
+untreated).
+
+**Altman at its published cutoffs alarms on 44% of windows** at a ~1% base rate:
+recall 0.93, precision 0.024. Threshold-free it is a reasonable ranker
+(ROC-AUC 0.81–0.85); as a decision rule it is unusable at this base rate.
+
+**Interpretability agrees on the recent quarters and disagrees on which one.**
+Both methods put the most weight on the final quarters; the Transformer's
+attention and SHAP agree that t-0 matters most (Spearman ρ = 0.40, not
+significant over 8 points), while the CNN-LSTM-Attention weights correlate
+strongly with SHAP (ρ = 0.93, p = 0.0009) but peak at t-1 rather than t-0. The
+disagreement is reported rather than resolved. Three of Altman's five ratios sit
+in the bottom third of the SHAP ranking.
+
+**The 2020–2021 COVID fold is not an outlier for the deep model** — rolling-origin
+PR-AUC is 0.087, 0.111, 0.107, 0.102 across the four expanding folds — but it is
+for Altman Z″, which drops to 0.013 from ~0.030 elsewhere.
+
+---
+
+## 10. Compute
 
 Measured on one NVIDIA T1000 8GB, Windows 11, PyTorch 2.14 + CUDA 12.6.
-`results/run_all_summary.json` records the wall time of the run that produced
-the current artefacts, and `reports/RESULTS.md` prints the total measured
-compute across all cached runs and tuning trials.
+
+| | |
+|---|---:|
+| Total measured compute, full universe | **13.7 h** |
+| Cached deep runs | 275 |
+| Full pipeline on the pilot, every gate | 29.8 min |
+| Unit tests (71, incl. 15 acceptance checks) | ~3 min |
+
+`reports/RESULTS.md` prints the total measured compute across all cached runs
+and tuning trials, and `results/PROVENANCE.json` lists every artefact with its
+SHA-256 and both repositories' git SHAs.
 
 The models are small — 31k to 71k parameters — and the binding cost is kernel
 launch overhead across roughly 2,700 optimiser steps per epoch at batch 32, not
-arithmetic. Larger batch sizes are in the search space for exactly that reason.
+arithmetic. Larger batch sizes are in the search space for exactly that reason;
+the Transformer's search nevertheless chose batch 32, which is why it accounts
+for more than half the total compute on its own.

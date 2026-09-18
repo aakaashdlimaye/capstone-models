@@ -9,7 +9,14 @@ import time
 from contextlib import contextmanager
 from pathlib import Path
 
+import matplotlib
 import numpy as np
+
+# Select a headless backend before anything can import pyplot.  On Windows the
+# default is TkAgg, whose Tcl handlers are torn down from the wrong thread at
+# interpreter shutdown and kill the process with `Tcl_AsyncDelete` after the
+# work is already done.
+matplotlib.use("Agg", force=True)
 
 from . import config as C
 

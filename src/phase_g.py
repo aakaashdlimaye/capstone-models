@@ -51,6 +51,11 @@ def rolling_origin(splits, j: pd.DataFrame, arch: str, horizon: int = CV_HORIZON
     quarters of that training range back as an inner validation set for early
     stopping and threshold choice, and scores the fold's out-of-sample period.
     """
+    cache = C.RESULTS / "rolling_origin_runs.csv"
+    if cache.exists() and not force:
+        print(f"[phase G] reusing {cache.name}")
+        return pd.read_csv(cache)
+
     X, Y, q, cik = _pooled_trainval(splits)
     y = Y[:, horizon - 1].astype(np.float32)
     hp = Tune.best_hparams(arch)

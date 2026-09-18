@@ -1,0 +1,165 @@
+{
+  "key": "lstm_4_smote_1",
+  "arch": "lstm",
+  "horizon": 4,
+  "treatment": "smote",
+  "seed": 1,
+  "tag": "",
+  "note": "",
+  "n_params": 37409,
+  "epochs_run": 19,
+  "best_epoch": 8,
+  "best_val_pr_auc": 0.2682040664542134,
+  "seconds": 104.99901390000014,
+  "device": "cuda",
+  "hparams": {
+    "lr": 0.0018879216212602324,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "imbalance_stats": {
+    "n_in": 86592,
+    "n_pos_in": 986,
+    "k_neighbors": 5,
+    "sampling_strategy": 1.0,
+    "seed": 1,
+    "applied": true,
+    "k_used": 5,
+    "n_out": 171212,
+    "n_pos_out": 85606,
+    "n_synthetic": 84620,
+    "treatment": "smote"
+  },
+  "feature_cols": null,
+  "data": {
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
+    "n_features": 29,
+    "with_indicators": false
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 0.1539829595399271,
+      "val_pr_auc": 0.118600380879478,
+      "val_roc_auc": 0.893412244227252
+    },
+    {
+      "epoch": 1,
+      "train_loss": 0.04552907520172359,
+      "val_pr_auc": 0.16859801439053085,
+      "val_roc_auc": 0.8883756019232968
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.026225342042139277,
+      "val_pr_auc": 0.139830013876573,
+      "val_roc_auc": 0.8953863561671239
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.018151682642991582,
+      "val_pr_auc": 0.16964166016224017,
+      "val_roc_auc": 0.9118903517232511
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.014473703813656461,
+      "val_pr_auc": 0.18126304998898707,
+      "val_roc_auc": 0.8857299079075217
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.01165309760112828,
+      "val_pr_auc": 0.22403555483693288,
+      "val_roc_auc": 0.8909250685871055
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.008898878154349579,
+      "val_pr_auc": 0.227905348279646,
+      "val_roc_auc": 0.889953417924097
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.007631261106479102,
+      "val_pr_auc": 0.21539170559140255,
+      "val_roc_auc": 0.891719893118427
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.0072996809145971075,
+      "val_pr_auc": 0.2682040664542134,
+      "val_roc_auc": 0.8926741290866483
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.0062252451342305155,
+      "val_pr_auc": 0.17965093800452384,
+      "val_roc_auc": 0.8934602462705761
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.005839696819586244,
+      "val_pr_auc": 0.19682296887305836,
+      "val_roc_auc": 0.8896004354566758
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.0052666018990254046,
+      "val_pr_auc": 0.15304955873367648,
+      "val_roc_auc": 0.8929976405321216
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.004989826152573272,
+      "val_pr_auc": 0.18582686790496278,
+      "val_roc_auc": 0.886668515303498
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.0044750916529790186,
+      "val_pr_auc": 0.22964112505065956,
+      "val_roc_auc": 0.8780678887317102
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.003828983196818856,
+      "val_pr_auc": 0.19937720495285555,
+      "val_roc_auc": 0.8958717349679927
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.004405264057567336,
+      "val_pr_auc": 0.2460457583111251,
+      "val_roc_auc": 0.8980923318187014
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.0034564228377364395,
+      "val_pr_auc": 0.22058574109825174,
+      "val_roc_auc": 0.8961340717163923
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.0031120703660018354,
+      "val_pr_auc": 0.18534359840146328,
+      "val_roc_auc": 0.8996074102652034
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.003703746194525099,
+      "val_pr_auc": 0.22807469880427828,
+      "val_roc_auc": 0.9073757037322817
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T09:39:17"
+}

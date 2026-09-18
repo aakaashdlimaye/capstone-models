@@ -1,0 +1,17 @@
+model,horizon,variables,coefficients,temporal,coef_intercept,coef_X1,coef_X2,coef_X3,coef_X4,coef_X1_wc_to_ta,coef_X2_re_to_ta,coef_X3_ebit_to_ta,coef_X4_equity_to_liab,coef_X5_asset_turnover
+A_zdp,1,Altman 5,published,static t-0,,,,,,,,,,
+A_zp,1,Altman 5,published,static t-0,,,,,,,,,,
+B_levels,1,Altman 4 (Z'' set),re-fit on train (levels),static t-0,0.3900902969929836,0.0005347667995860277,0.002163284925036009,-0.004014540363177411,-0.9433099073000956,,,,,
+B_tensor,1,Altman 5 (tensor t-0),re-fit on train (tensor ratios),static t-0,-1.2331811820701895,,,,,-0.6537591678383023,2.4758994289165575,-0.31885394975291687,-2.8644953099657147,-0.22546841827448874
+A_zdp,2,Altman 5,published,static t-0,,,,,,,,,,
+A_zp,2,Altman 5,published,static t-0,,,,,,,,,,
+B_levels,2,Altman 4 (Z'' set),re-fit on train (levels),static t-0,0.4602543819910816,0.004420923208406153,0.001420023204776888,-0.002434193188546072,-1.071053050319264,,,,,
+B_tensor,2,Altman 5 (tensor t-0),re-fit on train (tensor ratios),static t-0,-1.318786105639372,,,,,-0.04805867093480058,0.6138522731699744,-0.26692881103951516,-3.350304924308856,-0.2787085715188149
+A_zdp,3,Altman 5,published,static t-0,,,,,,,,,,
+A_zp,3,Altman 5,published,static t-0,,,,,,,,,,
+B_levels,3,Altman 4 (Z'' set),re-fit on train (levels),static t-0,0.48176661630570683,0.005825929448828127,0.0014803943672315016,-0.002787302357135545,-1.032974378746409,,,,,
+B_tensor,3,Altman 5 (tensor t-0),re-fit on train (tensor ratios),static t-0,-1.2569368140650299,,,,,0.01803416196039868,0.5780061897709968,-0.22071076087286703,-3.2905478738356377,-0.30534085425761154
+A_zdp,4,Altman 5,published,static t-0,,,,,,,,,,
+A_zp,4,Altman 5,published,static t-0,,,,,,,,,,
+B_levels,4,Altman 4 (Z'' set),re-fit on train (levels),static t-0,0.49080286677626717,0.004638625922249211,0.0017023111241526805,-0.0003115638430108924,-0.982508142115339,,,,,
+B_tensor,4,Altman 5 (tensor t-0),re-fit on train (tensor ratios),static t-0,-1.1750394108935955,,,,,0.061413888365312475,0.590840094061437,-0.23035566549092887,-3.158094469293667,-0.31563583940082823

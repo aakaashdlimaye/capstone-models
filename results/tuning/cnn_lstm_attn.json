@@ -1,0 +1,422 @@
+{
+  "arch": "cnn_lstm_attn",
+  "n_trials": 30,
+  "budget": {
+    "search_epochs": 15,
+    "search_patience": 5,
+    "final_epochs": 60,
+    "final_patience": 10,
+    "selection_metric": "validation PR-AUC",
+    "horizon": 4,
+    "treatment": "class_weight",
+    "seed": 1234
+  },
+  "space": {
+    "lr": [
+      "loguniform",
+      0.0001,
+      0.005
+    ],
+    "batch_size": [
+      "choice",
+      [
+        32,
+        64,
+        128,
+        256
+      ]
+    ],
+    "dropout": [
+      "choice",
+      [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5
+      ]
+    ],
+    "weight_decay": [
+      "choice",
+      [
+        0.0,
+        1e-05,
+        0.0001,
+        0.001
+      ]
+    ]
+  },
+  "best": {
+    "lr": 0.0028744152094248555,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0
+  },
+  "best_val_pr_auc": 0.21346466150479632,
+  "spec_default_val_pr_auc": 0.20016968701947513,
+  "trials": [
+    {
+      "trial": 0,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.001,
+      "batch_size": 32,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.20016968701947513,
+      "epochs_run": 15,
+      "seconds": 105.86278090000269,
+      "is_spec_default": true
+    },
+    {
+      "trial": 1,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.004564399055840275,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.14521745676758688,
+      "epochs_run": 15,
+      "seconds": 14.826254599989625,
+      "is_spec_default": false
+    },
+    {
+      "trial": 2,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.00027836048114898324,
+      "batch_size": 256,
+      "dropout": 0.1,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.09221924657395322,
+      "epochs_run": 15,
+      "seconds": 14.653245299996343,
+      "is_spec_default": false
+    },
+    {
+      "trial": 3,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0001587206606823287,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.05721022163440593,
+      "epochs_run": 15,
+      "seconds": 14.207125399989309,
+      "is_spec_default": false
+    },
+    {
+      "trial": 4,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.004344519184930514,
+      "batch_size": 64,
+      "dropout": 0.5,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.13155006524228507,
+      "epochs_run": 11,
+      "seconds": 40.75336179998703,
+      "is_spec_default": false
+    },
+    {
+      "trial": 5,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.000561379013614412,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.08776263966901468,
+      "epochs_run": 15,
+      "seconds": 53.363172099983785,
+      "is_spec_default": false
+    },
+    {
+      "trial": 6,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0029342585157723557,
+      "batch_size": 256,
+      "dropout": 0.3,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.1760741178912776,
+      "epochs_run": 15,
+      "seconds": 14.087397800001781,
+      "is_spec_default": false
+    },
+    {
+      "trial": 7,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0013216203701503452,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.13011263055108566,
+      "epochs_run": 15,
+      "seconds": 103.55205650001881,
+      "is_spec_default": false
+    },
+    {
+      "trial": 8,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.00019603575358382731,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.04997433867476306,
+      "epochs_run": 15,
+      "seconds": 108.17680489999475,
+      "is_spec_default": false
+    },
+    {
+      "trial": 9,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0001265242511922246,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.09079537499496816,
+      "epochs_run": 15,
+      "seconds": 101.88008730000001,
+      "is_spec_default": false
+    },
+    {
+      "trial": 10,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0010916947506150927,
+      "batch_size": 128,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.1913612821886348,
+      "epochs_run": 15,
+      "seconds": 27.181928899983177,
+      "is_spec_default": false
+    },
+    {
+      "trial": 11,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.004583536214102075,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.1442503811314466,
+      "epochs_run": 15,
+      "seconds": 52.785104600014165,
+      "is_spec_default": false
+    },
+    {
+      "trial": 12,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.00010123289633013626,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.050578287699751916,
+      "epochs_run": 15,
+      "seconds": 26.980288199993083,
+      "is_spec_default": false
+    },
+    {
+      "trial": 13,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0028744152094248555,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.21346466150479632,
+      "epochs_run": 13,
+      "seconds": 44.83217730000615,
+      "is_spec_default": false
+    },
+    {
+      "trial": 14,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0036857321257003583,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.1642491245790004,
+      "epochs_run": 15,
+      "seconds": 25.9398644999892,
+      "is_spec_default": false
+    },
+    {
+      "trial": 15,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.004850859181621986,
+      "batch_size": 64,
+      "dropout": 0.1,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.04564752362776459,
+      "epochs_run": 11,
+      "seconds": 41.62168549999478,
+      "is_spec_default": false
+    },
+    {
+      "trial": 16,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.00014047909631078305,
+      "batch_size": 256,
+      "dropout": 0.5,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.05578424435644859,
+      "epochs_run": 15,
+      "seconds": 14.738633900007699,
+      "is_spec_default": false
+    },
+    {
+      "trial": 17,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.002561107362345826,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.15218135097874355,
+      "epochs_run": 15,
+      "seconds": 14.931855800008634,
+      "is_spec_default": false
+    },
+    {
+      "trial": 18,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.004559345162620435,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.11613973226094676,
+      "epochs_run": 15,
+      "seconds": 15.120315500011202,
+      "is_spec_default": false
+    },
+    {
+      "trial": 19,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0005789256376730224,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.09743346413523739,
+      "epochs_run": 15,
+      "seconds": 14.45744550001109,
+      "is_spec_default": false
+    },
+    {
+      "trial": 20,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0001434213093560108,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.09052993621265147,
+      "epochs_run": 15,
+      "seconds": 52.40113700000802,
+      "is_spec_default": false
+    },
+    {
+      "trial": 21,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0008158492931137243,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.1262040110058053,
+      "epochs_run": 12,
+      "seconds": 80.04940469999565,
+      "is_spec_default": false
+    },
+    {
+      "trial": 22,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0003303974174112225,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.07539831844213887,
+      "epochs_run": 15,
+      "seconds": 54.15195030000177,
+      "is_spec_default": false
+    },
+    {
+      "trial": 23,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0018879216212602324,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.13160773713401888,
+      "epochs_run": 13,
+      "seconds": 45.52161610001349,
+      "is_spec_default": false
+    },
+    {
+      "trial": 24,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0018535552712323172,
+      "batch_size": 64,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.07770878597546059,
+      "epochs_run": 11,
+      "seconds": 38.8111804999935,
+      "is_spec_default": false
+    },
+    {
+      "trial": 25,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.00031524655077433536,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.1714343818029428,
+      "epochs_run": 15,
+      "seconds": 106.92961399999331,
+      "is_spec_default": false
+    },
+    {
+      "trial": 26,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0032146534419750924,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.13999588414645556,
+      "epochs_run": 15,
+      "seconds": 14.351658900006441,
+      "is_spec_default": false
+    },
+    {
+      "trial": 27,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0007426875391598964,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.1545172970347328,
+      "epochs_run": 15,
+      "seconds": 27.50791419998859,
+      "is_spec_default": false
+    },
+    {
+      "trial": 28,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.0005863517713207004,
+      "batch_size": 64,
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.15037276977345002,
+      "epochs_run": 15,
+      "seconds": 53.49436709997826,
+      "is_spec_default": false
+    },
+    {
+      "trial": 29,
+      "arch": "cnn_lstm_attn",
+      "lr": 0.004782560454855146,
+      "batch_size": 256,
+      "dropout": 0.1,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.1875904935203245,
+      "epochs_run": 15,
+      "seconds": 14.320052199997008,
+      "is_spec_default": false
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T02:08:49"
+}

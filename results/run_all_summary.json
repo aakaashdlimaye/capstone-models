@@ -1,0 +1,22 @@
+{
+  "phases": {
+    "d": {
+      "gate_pass": true,
+      "inflated_accuracy": 0.9992145047613924
+    },
+    "report": "C:\\Personal\\Aakaash\\MPSTME\\7th Sem\\Capstone\\capstone-models\\reports\\RESULTS.md"
+  },
+  "wall_seconds": 11.990547699999297,
+  "universe": "full",
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "tuning_trials": 30,
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T15:51:58"
+}

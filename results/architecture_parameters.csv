@@ -1,0 +1,5 @@
+architecture,n_parameters,n_features,n_outputs
+lstm,37409,29,1
+bilstm,52801,29,1
+transformer,70977,29,1
+cnn_lstm_attn,31073,29,1

@@ -160,20 +160,62 @@ def gaps(preds: dict, horizon: int, ladder=PRIMARY_LADDER) -> pd.DataFrame:
 
 
 def gap_shares(tab: pd.DataFrame, ladder=PRIMARY_LADDER) -> dict:
-    """What share of the total A->D gap does each step account for?"""
+    """What share of the A->D movement does each step account for?
+
+    Expressing a step as a share of the *net* A->D gap collapses as soon as one
+    step moves backwards: a small net total in the denominator turns an ordinary
+    step into several hundred percent.  Shares here are taken over the total
+    **absolute** movement across the three steps, which is bounded, sums to one,
+    and stays readable when a step degrades.  The signed change is reported
+    beside it so the direction is never lost.
+    """
     t = tab.set_index("model")
     out = {"horizon": int(tab["horizon"].iloc[0])}
     for metric in ("roc_auc", "pr_auc"):
-        total = float(t.loc[ladder[-1], metric] - t.loc[ladder[0], metric])
+        steps = {f"{ladder[i - 1]}->{ladder[i]}":
+                 float(t.loc[ladder[i], metric] - t.loc[ladder[i - 1], metric])
+                 for i in range(1, len(ladder))}
+        total_abs = sum(abs(v) for v in steps.values())
         out[f"{metric}_A"] = float(t.loc[ladder[0], metric])
         out[f"{metric}_D"] = float(t.loc[ladder[-1], metric])
-        out[f"{metric}_total_gap"] = total
-        for i in range(1, len(ladder)):
-            step = f"{ladder[i - 1]}->{ladder[i]}"
-            d = float(t.loc[ladder[i], metric] - t.loc[ladder[i - 1], metric])
-            out[f"{metric}_gap_{step}"] = d
-            out[f"{metric}_share_{step}"] = d / total if total else np.nan
+        out[f"{metric}_net_gap"] = float(t.loc[ladder[-1], metric] - t.loc[ladder[0], metric])
+        out[f"{metric}_total_abs_movement"] = total_abs
+        for step, g in steps.items():
+            out[f"{metric}_gap_{step}"] = g
+            out[f"{metric}_share_{step}"] = abs(g) / total_abs if total_abs else np.nan
+            out[f"{metric}_direction_{step}"] = "improves" if g > 0 else "degrades"
     return out
+
+
+CAUSE = {
+    "A_zdp->B_levels": "coefficient drift",
+    "B_levels->C_lstm": "the static formulation",
+    "C_lstm->D_lstm": "the feature-set expansion",
+}
+
+
+def headline(shares: dict, tab: pd.DataFrame, ladder=PRIMARY_LADDER,
+             metric: str = "pr_auc") -> str:
+    """The paper's one-sentence finding, with its numbers and intervals."""
+    parts = []
+    for i in range(1, len(ladder)):
+        step = f"{ladder[i - 1]}->{ladder[i]}"
+        parts.append(f"{shares[f'{metric}_share_{step}'] * 100:.0f}% is "
+                     f"{CAUSE.get(step, step)} ({shares[f'{metric}_gap_{step}']:+.4f}, "
+                     f"{shares[f'{metric}_direction_{step}']})")
+    t = tab.set_index("step")
+    drift_step = f"{ladder[0]} -> {ladder[1]}"
+    drift = ""
+    if drift_step in t.index:
+        drift = (f"  Re-estimating Altman's coefficients on modern training data is worth "
+                 f"{shares[f'{metric}_gap_' + ladder[0] + '->' + ladder[1]]:+.4f} PR-AUC, "
+                 f"95% CI [{t.loc[drift_step, 'pr_ci_low']:+.4f}, "
+                 f"{t.loc[drift_step, 'pr_ci_high']:+.4f}].")
+    return (f"At h={shares['horizon']}, test PR-AUC moves from {shares[f'{metric}_A']:.4f} for "
+            f"Altman Z″ to {shares[f'{metric}_D']:.4f} for the full temporal model, a net "
+            f"{shares[f'{metric}_net_gap']:+.4f}.  Of the "
+            f"{shares[f'{metric}_total_abs_movement']:.4f} of total movement across the three "
+            f"steps, " + ", ".join(parts) + "." + drift)
 
 
 def pr_curve_figure(preds: dict, horizon: int, out_stem, ladder=PRIMARY_LADDER) -> None:
@@ -247,12 +289,16 @@ def main(full: bool = True, horizons=C.HORIZONS, seeds=C.SEEDS,
 
     temporal_models(splits, horizons=horizons, seeds=seeds, force=force)
 
-    tables, shares = [], []
+    tables, primary, extended, shares = [], {}, {}, []
     for h in horizons:
         preds = collect_predictions(h, seeds=seeds)
         tab = gaps(preds, h)
         full_tab = gaps(preds, h, ladder=LADDER)
         tables.append(full_tab)
+        # The summary quotes intervals for the primary ladder's own steps, so it
+        # needs that table; the extended one carries D_transformer.
+        primary[h] = tab
+        extended[h] = full_tab
         U.write_table(tab, C.RESULTS / f"decomposition_{h}")
         pr_curve_figure(preds, h, C.FIGURES / f"decomposition_pr_h{h}")
         shares.append(gap_shares(tab))
@@ -268,32 +314,69 @@ def main(full: bool = True, horizons=C.HORIZONS, seeds=C.SEEDS,
     chk = complete_subset_check(splits, seeds=seeds, force=force)
     U.write_table(chk, C.RESULTS / "decomposition_complete_subset")
 
-    write_summary(sh, chk, tables)
+    write_summary(sh, chk, primary, extended)
     return {"horizons": list(horizons)}
 
 
-def write_summary(shares: pd.DataFrame, chk: pd.DataFrame, tables: list[pd.DataFrame]) -> None:
-    lines = ["# Decomposition summary", "",
-             "Four models on the identical row set.  A uses Altman's published",
-             "coefficients on the window's end quarter; B re-estimates those",
-             "coefficients on train; C gives the same variables an 8-quarter LSTM;",
-             "D gives the LSTM all 29 ratios.", ""]
+def write_summary(shares: pd.DataFrame, chk: pd.DataFrame,
+                  tables: dict[int, pd.DataFrame],
+                  extended: dict[int, pd.DataFrame] | None = None) -> None:
+    L = [
+        "# Decomposition summary", "",
+        "Four models on the identical row set.  **A** applies Altman's published Z″",
+        "coefficients to the window's end quarter; **B** re-estimates those coefficients",
+        "on train; **C** gives the same variables an 8-quarter LSTM; **D** gives the LSTM",
+        "all 29 ratios.  A→B isolates coefficient drift, B→C the static formulation,",
+        "C→D the feature set.", "",
+        "Shares are of the **total absolute movement** across the three steps, not of the",
+        "net A→D gap.  One step moves backwards, and dividing by a small net total would",
+        "report an ordinary step as several hundred percent.  Each step's signed change",
+        "and its 95% interval sit beside its share.", "",
+    ]
     for _, r in shares.iterrows():
         h = int(r["horizon"])
-        lines += [f"## Horizon h = {h}", ""]
-        for metric, label in (("pr_auc", "PR-AUC"), ("roc_auc", "ROC-AUC")):
-            tot = r[f"{metric}_total_gap"]
-            parts = []
-            for step in ("A_zdp->B_levels", "B_levels->C_lstm", "C_lstm->D_lstm"):
-                parts.append(f"{r[f'{metric}_share_{step}'] * 100:.0f}% "
-                             f"({r[f'{metric}_gap_{step}']:+.4f}) {step}")
-            lines.append(
-                f"- **{label}**: A = {r[f'{metric}_A']:.4f}, D = {r[f'{metric}_D']:.4f}, "
-                f"total gap {tot:+.4f}; attributable to " + "; ".join(parts) + ".")
-        lines.append("")
-    lines += ["## Missingness sanity check", "",
-              "Models C and D re-run on the subset of windows where all five Altman",
-              "ratios are observed in all eight quarters, to show the gaps are not a",
-              "missingness artefact.", "",
-              U.to_markdown(chk), ""]
-    (C.RESULTS / "decomposition_summary.md").write_text("\n".join(lines), encoding="utf-8")
+        tab = tables[h]
+        L += [f"## Horizon h = {h}", "", "> " + headline(r.to_dict(), tab), ""]
+        t = tab.set_index("step")
+        rows = []
+        for step in ("A_zdp->B_levels", "B_levels->C_lstm", "C_lstm->D_lstm"):
+            key = step.replace("->", " -> ")
+            has = key in t.index
+            rows.append({
+                "step": step, "cause": CAUSE.get(step, ""),
+                "PR-AUC change": r[f"pr_auc_gap_{step}"],
+                "PR-AUC 95% CI": (f"[{t.loc[key, 'pr_ci_low']:+.4f}, "
+                                  f"{t.loc[key, 'pr_ci_high']:+.4f}]") if has else "",
+                "share of movement": r[f"pr_auc_share_{step}"],
+                "direction": r[f"pr_auc_direction_{step}"],
+                "ROC-AUC change": r[f"roc_auc_gap_{step}"],
+                "DeLong 95% CI": (f"[{t.loc[key, 'delong_ci_low']:+.4f}, "
+                                  f"{t.loc[key, 'delong_ci_high']:+.4f}]") if has else "",
+                "DeLong p": t.loc[key, "delong_p"] if has else np.nan,
+                "McNemar p": t.loc[key, "mcnemar_p"] if has else np.nan,
+            })
+        L += [U.to_markdown(pd.DataFrame(rows)), ""]
+
+    L += ["## Is the finding LSTM-specific?", "",
+          "Model D is repeated with the Transformer.  Where the LSTM loses ground on the",
+          "full 29-ratio feature set, the Transformer recovers part of it, so C→D is",
+          "partly an LSTM capacity limitation rather than a pure statement about the",
+          "feature set.  Both are in `decomposition_all.csv`.", ""]
+    tr = [{"horizon": h,
+           "C_lstm PR-AUC": tab.set_index("model").loc["C_lstm", "pr_auc"],
+           "D_lstm PR-AUC": tab.set_index("model").loc["D_lstm", "pr_auc"],
+           "D_transformer PR-AUC": tab.set_index("model").loc["D_transformer", "pr_auc"],
+           "C_lstm ROC-AUC": tab.set_index("model").loc["C_lstm", "roc_auc"],
+           "D_lstm ROC-AUC": tab.set_index("model").loc["D_lstm", "roc_auc"],
+           "D_transformer ROC-AUC": tab.set_index("model").loc["D_transformer", "roc_auc"]}
+          for h, tab in sorted((extended or {}).items())
+          if "D_transformer" in set(tab["model"])]
+    if tr:
+        L += [U.to_markdown(pd.DataFrame(tr)), ""]
+
+    L += ["## Missingness sanity check", "",
+          "Models C and D retrained on the subset of windows where all five Altman ratios",
+          "are observed in all eight quarters.  If the gaps were a missingness artefact",
+          "they would close here.", "",
+          U.to_markdown(chk), ""]
+    (C.RESULTS / "decomposition_summary.md").write_text("\n".join(L), encoding="utf-8")

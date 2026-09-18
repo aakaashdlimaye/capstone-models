@@ -1,0 +1,254 @@
+{
+  "model": "logreg",
+  "n_trials": 30,
+  "best": {
+    "C": 0.15778700589260478
+  },
+  "best_val_pr_auc": 0.03142795341928215,
+  "default_val_pr_auc": 0.031400491299667266,
+  "trials": [
+    {
+      "trial": 0,
+      "model": "logreg",
+      "C": 1.0,
+      "val_pr_auc": 0.031400491299667266,
+      "seconds": 1.183718999993289,
+      "is_default": true
+    },
+    {
+      "trial": 1,
+      "model": "logreg",
+      "C": 0.00010433015975560071,
+      "val_pr_auc": 0.02726906069769986,
+      "seconds": 0.329698500019731,
+      "is_default": false
+    },
+    {
+      "trial": 2,
+      "model": "logreg",
+      "C": 7.087870182165282,
+      "val_pr_auc": 0.031394859842400695,
+      "seconds": 1.207616700005019,
+      "is_default": false
+    },
+    {
+      "trial": 3,
+      "model": "logreg",
+      "C": 0.15778700589260478,
+      "val_pr_auc": 0.03142795341928215,
+      "seconds": 1.1443540999898687,
+      "is_default": false
+    },
+    {
+      "trial": 4,
+      "model": "logreg",
+      "C": 0.0005493246762889695,
+      "val_pr_auc": 0.030103282083608626,
+      "seconds": 0.4115653000189923,
+      "is_default": false
+    },
+    {
+      "trial": 5,
+      "model": "logreg",
+      "C": 0.00035611627027439246,
+      "val_pr_auc": 0.02953425982556899,
+      "seconds": 0.4045085999823641,
+      "is_default": false
+    },
+    {
+      "trial": 6,
+      "model": "logreg",
+      "C": 17.647359885126413,
+      "val_pr_auc": 0.03139880525213477,
+      "seconds": 1.1298718999896664,
+      "is_default": false
+    },
+    {
+      "trial": 7,
+      "model": "logreg",
+      "C": 0.00020820280648590456,
+      "val_pr_auc": 0.028754627200263384,
+      "seconds": 0.3649594000016805,
+      "is_default": false
+    },
+    {
+      "trial": 8,
+      "model": "logreg",
+      "C": 18.009879132694522,
+      "val_pr_auc": 0.03140861620865046,
+      "seconds": 1.219329999992624,
+      "is_default": false
+    },
+    {
+      "trial": 9,
+      "model": "logreg",
+      "C": 0.10782948455334646,
+      "val_pr_auc": 0.03136716746799194,
+      "seconds": 1.0974577000015415,
+      "is_default": false
+    },
+    {
+      "trial": 10,
+      "model": "logreg",
+      "C": 0.0037619809749245307,
+      "val_pr_auc": 0.030967405129182182,
+      "seconds": 0.6259871000074781,
+      "is_default": false
+    },
+    {
+      "trial": 11,
+      "model": "logreg",
+      "C": 0.046483891763801424,
+      "val_pr_auc": 0.031312555679718496,
+      "seconds": 1.00101090001408,
+      "is_default": false
+    },
+    {
+      "trial": 12,
+      "model": "logreg",
+      "C": 0.03024679494312621,
+      "val_pr_auc": 0.031301406248641445,
+      "seconds": 0.940666800015606,
+      "is_default": false
+    },
+    {
+      "trial": 13,
+      "model": "logreg",
+      "C": 5.432141049817977,
+      "val_pr_auc": 0.031389934953811045,
+      "seconds": 1.1399158000131138,
+      "is_default": false
+    },
+    {
+      "trial": 14,
+      "model": "logreg",
+      "C": 0.002574489093034908,
+      "val_pr_auc": 0.030892082280035885,
+      "seconds": 0.5626946999982465,
+      "is_default": false
+    },
+    {
+      "trial": 15,
+      "model": "logreg",
+      "C": 13.625781988834158,
+      "val_pr_auc": 0.031369416776052345,
+      "seconds": 1.2210763999901246,
+      "is_default": false
+    },
+    {
+      "trial": 16,
+      "model": "logreg",
+      "C": 0.0009778687002506207,
+      "val_pr_auc": 0.030566497099195487,
+      "seconds": 0.49163569998927414,
+      "is_default": false
+    },
+    {
+      "trial": 17,
+      "model": "logreg",
+      "C": 0.32310432371264586,
+      "val_pr_auc": 0.03136632415965093,
+      "seconds": 1.164782899984857,
+      "is_default": false
+    },
+    {
+      "trial": 18,
+      "model": "logreg",
+      "C": 9.92307276636211,
+      "val_pr_auc": 0.0313777011449843,
+      "seconds": 1.1929396000050474,
+      "is_default": false
+    },
+    {
+      "trial": 19,
+      "model": "logreg",
+      "C": 16.862069044245118,
+      "val_pr_auc": 0.03138123093313616,
+      "seconds": 1.1086120999825653,
+      "is_default": false
+    },
+    {
+      "trial": 20,
+      "model": "logreg",
+      "C": 0.003065353858967016,
+      "val_pr_auc": 0.030904591536439395,
+      "seconds": 0.6270389000128489,
+      "is_default": false
+    },
+    {
+      "trial": 21,
+      "model": "logreg",
+      "C": 0.025371639939762346,
+      "val_pr_auc": 0.03127851261652087,
+      "seconds": 0.9796821000054479,
+      "is_default": false
+    },
+    {
+      "trial": 22,
+      "model": "logreg",
+      "C": 0.00018940245566494797,
+      "val_pr_auc": 0.028554301348226056,
+      "seconds": 0.34243610000703484,
+      "is_default": false
+    },
+    {
+      "trial": 23,
+      "model": "logreg",
+      "C": 0.7688450484641327,
+      "val_pr_auc": 0.03138292624722282,
+      "seconds": 1.1647015000053216,
+      "is_default": false
+    },
+    {
+      "trial": 24,
+      "model": "logreg",
+      "C": 59.29829419214348,
+      "val_pr_auc": 0.03138205879053448,
+      "seconds": 1.2056992999860086,
+      "is_default": false
+    },
+    {
+      "trial": 25,
+      "model": "logreg",
+      "C": 0.023488106454205963,
+      "val_pr_auc": 0.03127576161218898,
+      "seconds": 0.9119400999916252,
+      "is_default": false
+    },
+    {
+      "trial": 26,
+      "model": "logreg",
+      "C": 2.7864766711770614,
+      "val_pr_auc": 0.03138532244724793,
+      "seconds": 1.2301639000070281,
+      "is_default": false
+    },
+    {
+      "trial": 27,
+      "model": "logreg",
+      "C": 0.004660915733444023,
+      "val_pr_auc": 0.030990818235116128,
+      "seconds": 0.6771708999876864,
+      "is_default": false
+    },
+    {
+      "trial": 28,
+      "model": "logreg",
+      "C": 0.0021609118967459854,
+      "val_pr_auc": 0.03085406751103735,
+      "seconds": 0.568920599995181,
+      "is_default": false
+    },
+    {
+      "trial": 29,
+      "model": "logreg",
+      "C": 15.979931944694169,
+      "val_pr_auc": 0.031397380226304304,
+      "seconds": 1.2141072000085842,
+      "is_default": false
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T00:05:52"
+}

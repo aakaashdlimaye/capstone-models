@@ -1,0 +1,36 @@
+{
+  "key": "cmplD_lstm_4_class_weight_1",
+  "arch": "lstm",
+  "horizon": 4,
+  "treatment": "class_weight",
+  "seed": 1,
+  "tag": "cmplD",
+  "note": "all-five-Altman-complete subset",
+  "feature_cols": null,
+  "feature_names": "all 29",
+  "want_attention": false,
+  "hparams": {
+    "lr": 0.004564399055840275,
+    "batch_size": 256,
+    "dropout": 0.2,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "data": {
+    "n_train": 11511,
+    "n_val": 2237,
+    "n_test": 2863,
+    "n_features": 29,
+    "with_indicators": false
+  },
+  "early_stopping": {
+    "monitor": "validation PR-AUC",
+    "patience": 10
+  },
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T17:03:01"
+}
