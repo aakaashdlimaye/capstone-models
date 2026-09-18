@@ -5,9 +5,9 @@ No number in this file is typed by hand.
 
 - Universe: **full**
 - Dataset repository SHA: `b16eb17`
-- Models repository SHA: `d45fdcc`
+- Models repository SHA: `75f3e94`
 - Seeds: `[0, 1, 2, 3, 4]`; deep results are mean ± std over 5 seeds unless stated otherwise.
-- Generated: 2026-09-18T15:51:57
+- Generated: 2026-09-18T17:31:00
 - Total measured compute: **13.70 h** over 275 cached deep runs plus the logged tuning trials.
 
 Read PR-AUC first.  At a window-level positive rate of roughly 1% (0.18% at
@@ -450,60 +450,60 @@ losing to a constant that predicts no bankruptcy at all.
 
 | horizon | attention_model | shap_model | group | spearman_rho | spearman_p | kendall_tau | attention_argmax | shap_argmax | agree_on_top_quarter |
 |---|---|---|---|---|---|---|---|---|---|
-| 1 | transformer | transformer | true_positive | 0.4048 | 0.3199 | 0.3571 | t-0 | t-0 | True |
-| 1 | transformer | transformer | all_positive | 0.2857 | 0.4927 | 0.1429 | t-0 | t-0 | True |
-| 1 | cnn_lstm_attn | transformer | true_positive | 0.9271 | 0.0009 | 0.8487 | t-1 | t-0 | False |
-| 1 | cnn_lstm_attn | transformer | all_positive | 0.9271 | 0.0009 | 0.8487 | t-1 | t-0 | False |
-| 4 | transformer | transformer | true_positive | 0.9524 | 0.0003 | 0.8571 | t-0 | t-0 | True |
-| 4 | transformer | transformer | all_positive | 0.9286 | 0.0009 | 0.8571 | t-0 | t-0 | True |
-| 4 | cnn_lstm_attn | transformer | true_positive | 0.4880 | 0.2199 | 0.3858 | t-1 | t-0 | False |
-| 4 | cnn_lstm_attn | transformer | all_positive | 0.5092 | 0.1975 | 0.4158 | t-1 | t-0 | False |
+| 1 | transformer | transformer | true_positive | 0.7619 | 0.0280 | 0.6429 | t-0 | t-0 | True |
+| 1 | transformer | transformer | all_positive | 0.7619 | 0.0280 | 0.5714 | t-0 | t-0 | True |
+| 1 | cnn_lstm_attn | transformer | true_positive | 0.4880 | 0.2199 | 0.3858 | t-1 | t-0 | False |
+| 1 | cnn_lstm_attn | transformer | all_positive | 0.4880 | 0.2199 | 0.3858 | t-1 | t-0 | False |
+| 4 | transformer | transformer | true_positive | 0.8571 | 0.0065 | 0.7143 | t-0 | t-0 | True |
+| 4 | transformer | transformer | all_positive | 0.6905 | 0.0580 | 0.5714 | t-0 | t-0 | True |
+| 4 | cnn_lstm_attn | transformer | true_positive | 0.6831 | 0.0618 | 0.6172 | t-1 | t-0 | False |
+| 4 | cnn_lstm_attn | transformer | all_positive | 0.7395 | 0.0360 | 0.6425 | t-1 | t-0 | False |
 
 
 ### Ratio-family importance
 
 | horizon | family | n_features | mean_abs_shap | share |
 |---|---|---|---|---|
-| 1 | Distress flag | 1 | 0.02423 | 0.06140 |
-| 1 | Growth | 4 | 0.02329 | 0.23601 |
-| 1 | Liquidity | 4 | 0.01801 | 0.18248 |
-| 1 | Leverage | 5 | 0.01674 | 0.21207 |
-| 1 | Efficiency | 5 | 0.01182 | 0.14974 |
-| 1 | Cash flow | 4 | 0.01049 | 0.10627 |
-| 1 | Profitability | 6 | 0.00342 | 0.05204 |
-| 4 | Cash flow | 4 | 0.05521 | 0.22310 |
-| 4 | Distress flag | 1 | 0.04223 | 0.04267 |
-| 4 | Liquidity | 4 | 0.04105 | 0.16588 |
-| 4 | Efficiency | 5 | 0.03742 | 0.18899 |
-| 4 | Leverage | 5 | 0.03518 | 0.17769 |
-| 4 | Growth | 4 | 0.03148 | 0.12722 |
-| 4 | Profitability | 6 | 0.01228 | 0.07445 |
+| 1 | Distress flag | 1 | 0.01905 | 0.09844 |
+| 1 | Growth | 4 | 0.01091 | 0.22559 |
+| 1 | Leverage | 5 | 0.00803 | 0.20758 |
+| 1 | Cash flow | 4 | 0.00734 | 0.15175 |
+| 1 | Liquidity | 4 | 0.00570 | 0.11779 |
+| 1 | Efficiency | 5 | 0.00523 | 0.13512 |
+| 1 | Profitability | 6 | 0.00205 | 0.06373 |
+| 4 | Cash flow | 4 | 0.08853 | 0.19561 |
+| 4 | Distress flag | 1 | 0.07965 | 0.04400 |
+| 4 | Efficiency | 5 | 0.07437 | 0.20541 |
+| 4 | Liquidity | 4 | 0.07330 | 0.16195 |
+| 4 | Growth | 4 | 0.06161 | 0.13613 |
+| 4 | Leverage | 5 | 0.05987 | 0.16535 |
+| 4 | Profitability | 6 | 0.02762 | 0.09155 |
 
 
 ### Top features
 
 | horizon | rank | feature | family | mean_abs_shap | is_altman | observed_rate |
 |---|---|---|---|---|---|---|
-| 1 | 1 | r15_ltd_to_ta | Leverage | 0.04316 | False | 0.67420 |
-| 1 | 2 | r22_net_income_growth | Growth | 0.04286 | False | 0.98333 |
-| 1 | 3 | r24_equity_growth | Growth | 0.04131 | False | 0.98077 |
-| 1 | 4 | r01_current_ratio | Liquidity | 0.03442 | False | 0.99928 |
-| 1 | 5 | r16_asset_turnover | Efficiency | 0.02912 | True | 0.99736 |
-| 1 | 6 | r02_quick_ratio | Liquidity | 0.02644 | False | 0.76875 |
-| 1 | 7 | r29_negative_equity_flag | Distress flag | 0.02423 | False | 0.99551 |
-| 1 | 8 | r11_debt_to_equity | Leverage | 0.01577 | False | 0.62204 |
-| 1 | 9 | r14_equity_to_liabilities | Leverage | 0.01408 | True | 0.99543 |
-| 1 | 10 | r25_ocf_to_cl | Cash flow | 0.01349 | False | 0.99936 |
-| 4 | 1 | r25_ocf_to_cl | Cash flow | 0.12038 | False | 0.99826 |
-| 4 | 2 | r01_current_ratio | Liquidity | 0.08509 | False | 0.99859 |
-| 4 | 3 | r20_cash_conversion_cycle | Efficiency | 0.06207 | False | 0.56126 |
-| 4 | 4 | r19_payables_turnover | Efficiency | 0.05339 | False | 0.72658 |
-| 4 | 5 | r16_asset_turnover | Efficiency | 0.04941 | True | 0.99792 |
-| 4 | 6 | r24_equity_growth | Growth | 0.04809 | False | 0.98081 |
-| 4 | 7 | r15_ltd_to_ta | Leverage | 0.04730 | False | 0.68559 |
-| 4 | 8 | r22_net_income_growth | Growth | 0.04715 | False | 0.98148 |
-| 4 | 9 | r26_fcf_to_ta | Cash flow | 0.04618 | False | 0.91251 |
-| 4 | 10 | r14_equity_to_liabilities | Leverage | 0.04235 | True | 0.99550 |
+| 1 | 1 | r22_net_income_growth | Growth | 0.01907 | False | 0.98333 |
+| 1 | 2 | r29_negative_equity_flag | Distress flag | 0.01905 | False | 0.99551 |
+| 1 | 3 | r24_equity_growth | Growth | 0.01859 | False | 0.98077 |
+| 1 | 4 | r15_ltd_to_ta | Leverage | 0.01708 | False | 0.67420 |
+| 1 | 5 | r27_accrual_quality | Cash flow | 0.01161 | False | 0.99968 |
+| 1 | 6 | r16_asset_turnover | Efficiency | 0.01055 | True | 0.99736 |
+| 1 | 7 | r12_debt_to_assets | Leverage | 0.00928 | False | 0.62604 |
+| 1 | 8 | r01_current_ratio | Liquidity | 0.00849 | False | 0.99928 |
+| 1 | 9 | r02_quick_ratio | Liquidity | 0.00743 | False | 0.76875 |
+| 1 | 10 | r26_fcf_to_ta | Cash flow | 0.00702 | False | 0.90921 |
+| 4 | 1 | r25_ocf_to_cl | Cash flow | 0.16507 | False | 0.99826 |
+| 4 | 2 | r01_current_ratio | Liquidity | 0.10389 | False | 0.99859 |
+| 4 | 3 | r19_payables_turnover | Efficiency | 0.09944 | False | 0.72658 |
+| 4 | 4 | r16_asset_turnover | Efficiency | 0.09849 | True | 0.99792 |
+| 4 | 5 | r24_equity_growth | Growth | 0.09847 | False | 0.98081 |
+| 4 | 6 | r22_net_income_growth | Growth | 0.09545 | False | 0.98148 |
+| 4 | 7 | r02_quick_ratio | Liquidity | 0.09301 | False | 0.75658 |
+| 4 | 8 | r14_equity_to_liabilities | Leverage | 0.08391 | True | 0.99550 |
+| 4 | 9 | r29_negative_equity_flag | Distress flag | 0.07965 | False | 0.99550 |
+| 4 | 10 | r03_cash_ratio | Liquidity | 0.07750 | False | 0.92324 |
 
 
 ## 8. Robustness

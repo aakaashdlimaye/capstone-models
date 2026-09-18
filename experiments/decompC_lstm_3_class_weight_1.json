@@ -22,9 +22,9 @@
   ],
   "want_attention": false,
   "hparams": {
-    "lr": 0.004564399055840275,
-    "batch_size": 256,
-    "dropout": 0.2,
+    "lr": 0.0018879216212602324,
+    "batch_size": 64,
+    "dropout": 0.3,
     "weight_decay": 0.0,
     "grad_clip": 1.0,
     "max_epochs": 60,
@@ -32,9 +32,9 @@
     "arch_kwargs": {}
   },
   "data": {
-    "n_train": 12634,
-    "n_val": 2357,
-    "n_test": 3009,
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
     "n_features": 5,
     "with_indicators": false
   },
@@ -42,7 +42,7 @@
     "monitor": "validation PR-AUC",
     "patience": 10
   },
-  "models_sha": "d45fdcc",
+  "models_sha": "75f3e94",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-18T17:00:23"
+  "timestamp": "2026-09-18T17:10:44"
 }

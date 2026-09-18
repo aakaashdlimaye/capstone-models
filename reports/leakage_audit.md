@@ -4,7 +4,7 @@ The dataset repository proved its own four checks in
 `reports/leakage_audit_full.md`.  This file proves the four the modelling
 stage is responsible for.  Every claim prints the output it rests on.
 
-Dataset repo SHA `b16eb17`, models repo SHA `d45fdcc`.
+Dataset repo SHA `b16eb17`, models repo SHA `75f3e94`.
 
 ## (a) no window index appears in more than one split in any result file
 

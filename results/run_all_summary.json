@@ -4,9 +4,40 @@
       "gate_pass": true,
       "inflated_accuracy": 0.9992145047613924
     },
-    "report": "C:\\Personal\\Aakaash\\MPSTME\\7th Sem\\Capstone\\capstone-models\\reports\\RESULTS.md"
+    "report": "C:\\Personal\\Aakaash\\MPSTME\\7th Sem\\Capstone\\capstone-models\\reports\\RESULTS.md",
+    "e": {
+      "horizons": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "f": {
+      "best_arch": "transformer",
+      "n_crosschecks": 8
+    },
+    "g": {
+      "best_arch": "transformer",
+      "cv_folds": 4
+    },
+    "audit": {
+      "pass": true
+    },
+    "a": {
+      "gate_pass": true,
+      "n_rows": 139652
+    },
+    "b": {
+      "gate_pass": true,
+      "rows": 36
+    },
+    "c": {
+      "gate_pass": true,
+      "best_arch": "transformer",
+      "n_runs": 110
+    }
   },
-  "wall_seconds": 11.990547699999297,
   "universe": "full",
   "seeds": [
     0,
@@ -16,7 +47,52 @@
     4
   ],
   "tuning_trials": 30,
-  "models_sha": "d45fdcc",
+  "wall_seconds_total": 1190.900678200007,
+  "invocations": [
+    {
+      "phases": [
+        "d",
+        "e",
+        "f",
+        "g",
+        "audit",
+        "report"
+      ],
+      "wall_seconds": 694.9909949000285,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "75f3e94",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-18T17:22:07"
+    },
+    {
+      "phases": [
+        "a",
+        "b",
+        "c",
+        "report"
+      ],
+      "wall_seconds": 495.9096832999785,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "75f3e94",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-18T17:31:02"
+    }
+  ],
+  "models_sha": "75f3e94",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-18T15:51:58"
+  "timestamp": "2026-09-18T17:31:02"
 }
