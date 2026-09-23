@@ -81,8 +81,14 @@ def check_b(full: bool = True) -> tuple[bool, list[str]]:
         tag, h, t = r.get("tag", ""), r.get("horizon"), r.get("treatment")
         if t == "class_weight" and "n" in st:
             exp_pos = C.EXPECTED_POSITIVES["train"].get(h if isinstance(h, int) else 4)
-            ok = (st["n"] == n_train) if not tag else True
+            # An untagged run must weight on the whole train split and nothing
+            # else.  A tagged run (embargo, complete-subset, CV fold) trains on
+            # a subset of train, so the test is that it never exceeds it — a
+            # statistic that had touched val or test would have to.
+            ok = (st["n"] == n_train) if not tag else (st["n"] <= n_train)
             if isinstance(h, int) and not tag and st.get("n_pos") != exp_pos:
+                ok = False
+            if st.get("n_pos", 0) > (exp_pos or n_train):
                 ok = False
             cw_rows.append({"key": r["key"], "n": st["n"], "n_pos": st.get("n_pos"),
                             "pos_weight": round(st.get("pos_weight", float("nan")), 2),
@@ -90,7 +96,7 @@ def check_b(full: bool = True) -> tuple[bool, list[str]]:
             if not ok:
                 bad.append(r["key"])
         if t == "smote" and st.get("applied"):
-            ok = (st["n_in"] == n_train) if not tag else True
+            ok = (st["n_in"] == n_train) if not tag else (st["n_in"] <= n_train)
             smote_rows.append({"key": r["key"], "n_in": st["n_in"],
                                "n_pos_in": st.get("n_pos_in"),
                                "n_out": st.get("n_out"),
@@ -113,6 +119,16 @@ def check_b(full: bool = True) -> tuple[bool, list[str]]:
     lines += ["",
               "Val and test tensors are never passed to a resampler: `train_one` applies",
               "SMOTE to Xtr/ytr only, and `make_loss` is built from train labels only.",
+              "",
+              "Untagged runs must weight or resample exactly the train split; tagged runs",
+              "(embargo, complete-subset, CV folds) train on a subset of it, so the test",
+              "there is that the statistic never exceeds the train split, which it would",
+              "have to if it had reached val or test.",
+              "",
+              "The three protocol-audit runs deliberately break this rule -- that is what",
+              "they exist to measure -- and are excluded here by construction: they call",
+              "the training loop directly and write no run record, so nothing they produce",
+              "reaches any reported table other than results/protocol_audit*.csv.",
               "```"]
     return not bad, lines
 

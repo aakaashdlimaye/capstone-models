@@ -1,0 +1,168 @@
+{
+  "key": "decompC_lstm_2_class_weight_1",
+  "arch": "lstm",
+  "horizon": 2,
+  "treatment": "class_weight",
+  "seed": 1,
+  "tag": "decompC",
+  "note": "Model C: Altman's five ratios, 8-quarter LSTM",
+  "n_params": 31265,
+  "epochs_run": 19,
+  "best_epoch": 8,
+  "best_val_pr_auc": 0.18301660124099325,
+  "seconds": 61.952316500013694,
+  "device": "cuda",
+  "hparams": {
+    "lr": 0.0018879216212602324,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "imbalance_stats": {
+    "applied": false,
+    "treatment": "class_weight",
+    "pos_weight": 210.2,
+    "w_pos": 105.6,
+    "w_neg": 0.5023786869647955,
+    "n": 86592,
+    "n_pos": 410,
+    "n_neg": 86182
+  },
+  "feature_cols": [
+    3,
+    9,
+    8,
+    13,
+    15
+  ],
+  "data": {
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
+    "n_features": 5,
+    "with_indicators": false
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 3.1578711081855135,
+      "val_pr_auc": 0.005285195660132139,
+      "val_roc_auc": 0.647639507676202
+    },
+    {
+      "epoch": 1,
+      "train_loss": 3.012570445306726,
+      "val_pr_auc": 0.018174582626174156,
+      "val_roc_auc": 0.7420236045842279
+    },
+    {
+      "epoch": 2,
+      "train_loss": 2.3699751781342386,
+      "val_pr_auc": 0.06804733643364856,
+      "val_roc_auc": 0.8731540061143832
+    },
+    {
+      "epoch": 3,
+      "train_loss": 2.2060099374076128,
+      "val_pr_auc": 0.08415994937251323,
+      "val_roc_auc": 0.8854424384849509
+    },
+    {
+      "epoch": 4,
+      "train_loss": 2.1083733557949924,
+      "val_pr_auc": 0.11423596448086529,
+      "val_roc_auc": 0.8946709671207819
+    },
+    {
+      "epoch": 5,
+      "train_loss": 2.1228528977850147,
+      "val_pr_auc": 0.11336401149434669,
+      "val_roc_auc": 0.8878412728331672
+    },
+    {
+      "epoch": 6,
+      "train_loss": 2.119340917752217,
+      "val_pr_auc": 0.1478857493822304,
+      "val_roc_auc": 0.9159567233468688
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.9879100768546747,
+      "val_pr_auc": 0.14809389166921177,
+      "val_roc_auc": 0.9202235024744335
+    },
+    {
+      "epoch": 8,
+      "train_loss": 1.9903213489698817,
+      "val_pr_auc": 0.18301660124099325,
+      "val_roc_auc": 0.915311248417671
+    },
+    {
+      "epoch": 9,
+      "train_loss": 2.062807476441242,
+      "val_pr_auc": 0.1504552758269772,
+      "val_roc_auc": 0.906654968563608
+    },
+    {
+      "epoch": 10,
+      "train_loss": 1.9654843259192536,
+      "val_pr_auc": 0.16131403290722618,
+      "val_roc_auc": 0.9071261923827179
+    },
+    {
+      "epoch": 11,
+      "train_loss": 1.9459377381859757,
+      "val_pr_auc": 0.16195358864723178,
+      "val_roc_auc": 0.9081642408245263
+    },
+    {
+      "epoch": 12,
+      "train_loss": 1.9022731964269217,
+      "val_pr_auc": 0.1643558262491185,
+      "val_roc_auc": 0.9015840578540805
+    },
+    {
+      "epoch": 13,
+      "train_loss": 1.9417588374214707,
+      "val_pr_auc": 0.13693823678083,
+      "val_roc_auc": 0.8989892757595009
+    },
+    {
+      "epoch": 14,
+      "train_loss": 1.9030301586751663,
+      "val_pr_auc": 0.12855185805184607,
+      "val_roc_auc": 0.9068082010573042
+    },
+    {
+      "epoch": 15,
+      "train_loss": 1.8851990512980414,
+      "val_pr_auc": 0.14565742721105324,
+      "val_roc_auc": 0.9075438526310223
+    },
+    {
+      "epoch": 16,
+      "train_loss": 1.909076293133315,
+      "val_pr_auc": 0.14741376690072755,
+      "val_roc_auc": 0.8894658084742993
+    },
+    {
+      "epoch": 17,
+      "train_loss": 1.8775751151953992,
+      "val_pr_auc": 0.1663732361781074,
+      "val_roc_auc": 0.8943136506421188
+    },
+    {
+      "epoch": 18,
+      "train_loss": 1.8971191767137843,
+      "val_pr_auc": 0.16754378461675926,
+      "val_roc_auc": 0.9108136035197368
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T13:10:02"
+}

@@ -1,0 +1,36 @@
+{
+  "key": "lstm_multi_class_weight_4",
+  "arch": "lstm",
+  "horizon": "multi",
+  "treatment": "class_weight",
+  "seed": 4,
+  "tag": "",
+  "note": "multi-horizon 4-unit sigmoid head",
+  "feature_cols": null,
+  "feature_names": "all 29",
+  "want_attention": false,
+  "hparams": {
+    "lr": 0.0018879216212602324,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "data": {
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
+    "n_features": 29,
+    "with_indicators": false
+  },
+  "early_stopping": {
+    "monitor": "validation PR-AUC",
+    "patience": 10
+  },
+  "models_sha": "75f3e94",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T17:30:58"
+}

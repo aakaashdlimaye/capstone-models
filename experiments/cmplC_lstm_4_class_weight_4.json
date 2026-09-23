@@ -1,0 +1,48 @@
+{
+  "key": "cmplC_lstm_4_class_weight_4",
+  "arch": "lstm",
+  "horizon": 4,
+  "treatment": "class_weight",
+  "seed": 4,
+  "tag": "cmplC",
+  "note": "all-five-Altman-complete subset",
+  "feature_cols": [
+    3,
+    9,
+    8,
+    13,
+    15
+  ],
+  "feature_names": [
+    "r04_wc_to_ta",
+    "r10_re_to_ta",
+    "r09_ebit_to_ta",
+    "r14_equity_to_liabilities",
+    "r16_asset_turnover"
+  ],
+  "want_attention": false,
+  "hparams": {
+    "lr": 0.0018879216212602324,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "data": {
+    "n_train": 79378,
+    "n_val": 19673,
+    "n_test": 30678,
+    "n_features": 5,
+    "with_indicators": false
+  },
+  "early_stopping": {
+    "monitor": "validation PR-AUC",
+    "patience": 10
+  },
+  "models_sha": "75f3e94",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T17:20:14"
+}

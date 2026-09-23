@@ -1,0 +1,4 @@
+| horizon | inflated_pr_auc | half_fixed_pr_auc | correct_pr_auc | pr_auc_lost_to_chronological_split | pr_auc_lost_to_resampling_inside_train | total_pr_auc_collapse | share_chronological_split | share_resampling_inside_train | inflated_over_correct_pr_auc | inflated_accuracy | half_fixed_accuracy | correct_accuracy | correct_test_base_rate | majority_class_accuracy | model_beats_majority_class | correct_pr_auc_over_base_rate |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0.9998 | 0.9511 | 0.0217 | 0.0488 | 0.9294 | 0.9782 | 0.0499 | 0.9501 | 46.0827 | 0.9992 | 0.8444 | 0.9974 | 0.0019 | 0.9981 | False | 11.6498 |
+| 4 | 0.9996 | 0.9649 | 0.0410 | 0.0347 | 0.9239 | 0.9587 | 0.0362 | 0.9638 | 24.4040 | 0.9974 | 0.8649 | 0.9851 | 0.0113 | 0.9887 | False | 3.6354 |

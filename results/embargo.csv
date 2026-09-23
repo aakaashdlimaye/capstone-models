@@ -1,0 +1,2 @@
+horizon,arch,status,n_train,n_val,n_test,pos_train,pos_val,pos_test,embargo_roc_auc,embargo_pr_auc,standard_model_on_embargo_rows_roc_auc,standard_model_on_embargo_rows_pr_auc,pr_auc_difference
+4,transformer,evaluated,86592,2642,13106,986,9,81,0.8486633018174925,0.04661700722118472,0.8568365678538422,0.06276951686722891,-0.016152509646044193

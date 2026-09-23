@@ -12,6 +12,7 @@ exist is not retrained, so an interrupted run resumes where it stopped.
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -30,7 +31,8 @@ def parse_args(argv=None):
                          "results_pilot/ and is never a reportable number")
     ap.add_argument("--from", dest="start", choices=PHASES, default="a")
     ap.add_argument("--only", nargs="+", choices=PHASES)
-    ap.add_argument("--seeds", type=int, default=5)
+    ap.add_argument("--seeds", type=int, default=None,
+                    help="seeds per configuration (default 5, or 3 in pilot mode)")
     ap.add_argument("--trials", type=int, default=None,
                     help="tuning trials per model (default 30, or 3 in pilot mode)")
     ap.add_argument("--force", action="store_true", help="ignore cached runs")
@@ -42,7 +44,8 @@ def parse_args(argv=None):
 def main(argv=None) -> int:
     a = parse_args(argv)
 
-    # Paths must be set before src.config is imported.
+    # Headless plotting, and paths, must both be set before src is imported.
+    os.environ.setdefault("MPLBACKEND", "Agg")
     if a.pilot:
         os.environ["CAPSTONE_RESULTS_DIR"] = str(REPO / "results_pilot")
         os.environ["CAPSTONE_REPORTS_DIR"] = str(REPO / "reports_pilot")
@@ -52,7 +55,11 @@ def main(argv=None) -> int:
     from src import utils as U
 
     full = not a.pilot
-    seeds = tuple(range(a.seeds))
+    # The pilot is a wiring check whose numbers are never reported, so it runs a
+    # cheaper budget by default and fits inside a coffee break.  Every reported
+    # number comes from the full universe at 5 seeds and 30 trials.  Both are
+    # overridable: `--pilot --seeds 5 --trials 30` reproduces the full budget.
+    seeds = tuple(range(a.seeds if a.seeds is not None else (3 if a.pilot else len(C.SEEDS))))
     trials = a.trials if a.trials is not None else (3 if a.pilot else C.TUNING_TRIALS)
     if a.quick:
         C.MAX_EPOCHS, C.PATIENCE = 4, 2
@@ -104,9 +111,25 @@ def main(argv=None) -> int:
     for k, v in out.items():
         print(f"  {k}: {v}")
     print("=" * 70)
-    U.write_json(C.RESULTS / "run_all_summary.json",
-                 {"phases": out, "wall_seconds": dt, "universe": "full" if full else "pilot",
-                  "seeds": list(seeds), "tuning_trials": trials, **U.provenance()})
+    # A resumed run must not erase the phases an earlier one completed: merge
+    # into whatever is already there so the summary describes the artefacts on
+    # disk rather than only the last invocation.
+    summary_path = C.RESULTS / "run_all_summary.json"
+    prev = {}
+    if summary_path.exists():
+        try:
+            prev = json.loads(summary_path.read_text(encoding="utf-8"))
+        except Exception:
+            prev = {}
+    phases = {**prev.get("phases", {}), **out}
+    invocations = prev.get("invocations", [])
+    invocations.append({"phases": todo, "wall_seconds": dt, "seeds": list(seeds),
+                        "tuning_trials": trials, **U.provenance()})
+    U.write_json(summary_path,
+                 {"phases": phases, "universe": "full" if full else "pilot",
+                  "seeds": list(seeds), "tuning_trials": trials,
+                  "wall_seconds_total": sum(i["wall_seconds"] for i in invocations),
+                  "invocations": invocations, **U.provenance()})
     return 0
 
 

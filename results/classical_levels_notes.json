@@ -1,0 +1,129 @@
+{
+  "panel_rows": 284915,
+  "TL_from_identity": 446,
+  "Revenue_ttm_fallback_rows": 38344,
+  "NetIncomeLoss_ttm_fallback_rows": 40729,
+  "OCF_ttm_fallback_rows": 41146,
+  "EBIT_ttm_fallback_rows": 38666,
+  "deflator_missing_rows": 0,
+  "imputer_fitted_on": "train split rows only",
+  "imputer_train_rows": 86592,
+  "train_medians": {
+    "X1": 0.16225492359619392,
+    "X2": 0.04189512330416566,
+    "X3": 0.04586231198628778,
+    "X4": 0.7035568887936576,
+    "X5": 0.8101645062749951,
+    "SIZE": 20.4146667272252,
+    "TLTA": 0.5805449663372442,
+    "WCTA": 0.16225492359619392,
+    "CLCA": 0.5685661503481597,
+    "OENEG": 0.0,
+    "NITA": 0.02374572788034534,
+    "FUTL": 0.11479134774357813,
+    "INTWO": 0.0,
+    "CHIN": 0.01776828366496048,
+    "CACL": 1.7585152292361592
+  },
+  "missing_before_impute": [
+    {
+      "variable": "X1",
+      "n_missing": 406,
+      "rate": 0.002907226534528686,
+      "train_median": 0.16225492359619392
+    },
+    {
+      "variable": "X2",
+      "n_missing": 3986,
+      "rate": 0.028542376765101823,
+      "train_median": 0.04189512330416566
+    },
+    {
+      "variable": "X3",
+      "n_missing": 1553,
+      "rate": 0.011120499527396672,
+      "train_median": 0.04586231198628778
+    },
+    {
+      "variable": "X4",
+      "n_missing": 1131,
+      "rate": 0.008098702489044195,
+      "train_median": 0.7035568887936576
+    },
+    {
+      "variable": "X5",
+      "n_missing": 1168,
+      "rate": 0.00836364677913671,
+      "train_median": 0.8101645062749951
+    },
+    {
+      "variable": "SIZE",
+      "n_missing": 13,
+      "rate": 9.308853435682984e-05,
+      "train_median": 20.4146667272252
+    },
+    {
+      "variable": "TLTA",
+      "n_missing": 604,
+      "rate": 0.004325036519348094,
+      "train_median": 0.5805449663372442
+    },
+    {
+      "variable": "WCTA",
+      "n_missing": 406,
+      "rate": 0.002907226534528686,
+      "train_median": 0.16225492359619392
+    },
+    {
+      "variable": "CLCA",
+      "n_missing": 411,
+      "rate": 0.00294302981697362,
+      "train_median": 0.5685661503481597
+    },
+    {
+      "variable": "OENEG",
+      "n_missing": 594,
+      "rate": 0.004253429954458225,
+      "train_median": 0.0
+    },
+    {
+      "variable": "NITA",
+      "n_missing": 367,
+      "rate": 0.002627960931458196,
+      "train_median": 0.02374572788034534
+    },
+    {
+      "variable": "FUTL",
+      "n_missing": 1427,
+      "rate": 0.010218256809784321,
+      "train_median": 0.11479134774357813
+    },
+    {
+      "variable": "INTWO",
+      "n_missing": 560,
+      "rate": 0.00400996763383267,
+      "train_median": 0.0
+    },
+    {
+      "variable": "CHIN",
+      "n_missing": 570,
+      "rate": 0.0040815741987225386,
+      "train_median": 0.01776828366496048
+    },
+    {
+      "variable": "CACL",
+      "n_missing": 401,
+      "rate": 0.002871423252083751,
+      "train_median": 1.7585152292361592
+    }
+  ],
+  "ttm_fallback_on_row_set": {
+    "Revenue": 1640,
+    "EBIT": 1460,
+    "NetIncomeLoss": 1066,
+    "OCF": 2029
+  },
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-17T23:21:12"
+}

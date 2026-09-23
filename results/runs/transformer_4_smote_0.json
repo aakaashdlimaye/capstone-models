@@ -1,0 +1,165 @@
+{
+  "key": "transformer_4_smote_0",
+  "arch": "transformer",
+  "horizon": 4,
+  "treatment": "smote",
+  "seed": 0,
+  "tag": "",
+  "note": "",
+  "n_params": 70977,
+  "epochs_run": 19,
+  "best_epoch": 8,
+  "best_val_pr_auc": 0.23042501852490369,
+  "seconds": 443.8923325999931,
+  "device": "cuda",
+  "hparams": {
+    "lr": 0.0013216203701503452,
+    "batch_size": 32,
+    "dropout": 0.4,
+    "weight_decay": 0.0001,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "imbalance_stats": {
+    "n_in": 86592,
+    "n_pos_in": 986,
+    "k_neighbors": 5,
+    "sampling_strategy": 1.0,
+    "seed": 0,
+    "applied": true,
+    "k_used": 5,
+    "n_out": 171212,
+    "n_pos_out": 85606,
+    "n_synthetic": 84620,
+    "treatment": "smote"
+  },
+  "feature_cols": null,
+  "data": {
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
+    "n_features": 29,
+    "with_indicators": false
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 0.25947238018509217,
+      "val_pr_auc": 0.06640016441380442,
+      "val_roc_auc": 0.9212677183356196
+    },
+    {
+      "epoch": 1,
+      "train_loss": 0.1634003206733465,
+      "val_pr_auc": 0.0993527697631746,
+      "val_roc_auc": 0.9107530381944444
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.13480542625881947,
+      "val_pr_auc": 0.12841205560385052,
+      "val_roc_auc": 0.9109975137174211
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.1207884587163867,
+      "val_pr_auc": 0.11157879775108753,
+      "val_roc_auc": 0.89442229652492
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.1107134014591559,
+      "val_pr_auc": 0.1368627206301511,
+      "val_roc_auc": 0.89211909150663
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.1045006405618473,
+      "val_pr_auc": 0.13830435739410227,
+      "val_roc_auc": 0.9164384895118884
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.09870335735082822,
+      "val_pr_auc": 0.16618821152948468,
+      "val_roc_auc": 0.898857685328075
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.09251755270877625,
+      "val_pr_auc": 0.11751914064643987,
+      "val_roc_auc": 0.9075002857796067
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.0896470651608094,
+      "val_pr_auc": 0.23042501852490369,
+      "val_roc_auc": 0.8914396951446046
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.08833330420582378,
+      "val_pr_auc": 0.10444548906700585,
+      "val_roc_auc": 0.8890949627772063
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.08379901794814323,
+      "val_pr_auc": 0.17126305934945701,
+      "val_roc_auc": 0.8918368841449473
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.08147005110988131,
+      "val_pr_auc": 0.1239292468699336,
+      "val_roc_auc": 0.8861766618084133
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.07879109785127503,
+      "val_pr_auc": 0.12829009328865648,
+      "val_roc_auc": 0.9070256237139918
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.07464003987928708,
+      "val_pr_auc": 0.11548302251735641,
+      "val_roc_auc": 0.8980874199817102
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.07447899821383723,
+      "val_pr_auc": 0.18799833953391984,
+      "val_roc_auc": 0.9154873792581162
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.07369696450891293,
+      "val_pr_auc": 0.16817656885053675,
+      "val_roc_auc": 0.8877814929126657
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.07266076286270823,
+      "val_pr_auc": 0.14337393920877195,
+      "val_roc_auc": 0.8950295781893004
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.070780612541031,
+      "val_pr_auc": 0.17683385321516645,
+      "val_roc_auc": 0.8751725840906492
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.06978517609929502,
+      "val_pr_auc": 0.17144807826404954,
+      "val_roc_auc": 0.8920378229309556
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T10:31:02"
+}

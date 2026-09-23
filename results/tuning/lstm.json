@@ -1,0 +1,422 @@
+{
+  "arch": "lstm",
+  "n_trials": 30,
+  "budget": {
+    "search_epochs": 15,
+    "search_patience": 5,
+    "final_epochs": 60,
+    "final_patience": 10,
+    "selection_metric": "validation PR-AUC",
+    "horizon": 4,
+    "treatment": "class_weight",
+    "seed": 1234
+  },
+  "space": {
+    "lr": [
+      "loguniform",
+      0.0001,
+      0.005
+    ],
+    "batch_size": [
+      "choice",
+      [
+        32,
+        64,
+        128,
+        256
+      ]
+    ],
+    "dropout": [
+      "choice",
+      [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5
+      ]
+    ],
+    "weight_decay": [
+      "choice",
+      [
+        0.0,
+        1e-05,
+        0.0001,
+        0.001
+      ]
+    ]
+  },
+  "best": {
+    "lr": 0.0018879216212602324,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0
+  },
+  "best_val_pr_auc": 0.3081125889397597,
+  "spec_default_val_pr_auc": 0.18220983907709348,
+  "trials": [
+    {
+      "trial": 0,
+      "arch": "lstm",
+      "lr": 0.001,
+      "batch_size": 32,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.18220983907709348,
+      "epochs_run": 15,
+      "seconds": 93.71862109997892,
+      "is_spec_default": true
+    },
+    {
+      "trial": 1,
+      "arch": "lstm",
+      "lr": 0.004564399055840275,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.25630076216906106,
+      "epochs_run": 15,
+      "seconds": 13.59006310001132,
+      "is_spec_default": false
+    },
+    {
+      "trial": 2,
+      "arch": "lstm",
+      "lr": 0.00027836048114898324,
+      "batch_size": 256,
+      "dropout": 0.1,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.06818009269038591,
+      "epochs_run": 15,
+      "seconds": 14.314939100004267,
+      "is_spec_default": false
+    },
+    {
+      "trial": 3,
+      "arch": "lstm",
+      "lr": 0.0001587206606823287,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.04399786762900368,
+      "epochs_run": 11,
+      "seconds": 10.389449199981755,
+      "is_spec_default": false
+    },
+    {
+      "trial": 4,
+      "arch": "lstm",
+      "lr": 0.004344519184930514,
+      "batch_size": 64,
+      "dropout": 0.5,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.2679378288117131,
+      "epochs_run": 15,
+      "seconds": 48.653553600015584,
+      "is_spec_default": false
+    },
+    {
+      "trial": 5,
+      "arch": "lstm",
+      "lr": 0.000561379013614412,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.09426348344531009,
+      "epochs_run": 15,
+      "seconds": 47.958394899993436,
+      "is_spec_default": false
+    },
+    {
+      "trial": 6,
+      "arch": "lstm",
+      "lr": 0.0029342585157723557,
+      "batch_size": 256,
+      "dropout": 0.3,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.2001579180197455,
+      "epochs_run": 15,
+      "seconds": 14.14602179999929,
+      "is_spec_default": false
+    },
+    {
+      "trial": 7,
+      "arch": "lstm",
+      "lr": 0.0013216203701503452,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.21276999416349207,
+      "epochs_run": 15,
+      "seconds": 94.78439859999344,
+      "is_spec_default": false
+    },
+    {
+      "trial": 8,
+      "arch": "lstm",
+      "lr": 0.00019603575358382731,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.0449399246993291,
+      "epochs_run": 15,
+      "seconds": 93.95245630000136,
+      "is_spec_default": false
+    },
+    {
+      "trial": 9,
+      "arch": "lstm",
+      "lr": 0.0001265242511922246,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.08761262332918715,
+      "epochs_run": 15,
+      "seconds": 95.87679609999759,
+      "is_spec_default": false
+    },
+    {
+      "trial": 10,
+      "arch": "lstm",
+      "lr": 0.0010916947506150927,
+      "batch_size": 128,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.19573733955804226,
+      "epochs_run": 15,
+      "seconds": 25.10106790001737,
+      "is_spec_default": false
+    },
+    {
+      "trial": 11,
+      "arch": "lstm",
+      "lr": 0.004583536214102075,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.2974908901945734,
+      "epochs_run": 15,
+      "seconds": 47.449974499992095,
+      "is_spec_default": false
+    },
+    {
+      "trial": 12,
+      "arch": "lstm",
+      "lr": 0.00010123289633013626,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.04385393159086177,
+      "epochs_run": 15,
+      "seconds": 25.1644479999959,
+      "is_spec_default": false
+    },
+    {
+      "trial": 13,
+      "arch": "lstm",
+      "lr": 0.0028744152094248555,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.3000008830704807,
+      "epochs_run": 15,
+      "seconds": 47.175190800015116,
+      "is_spec_default": false
+    },
+    {
+      "trial": 14,
+      "arch": "lstm",
+      "lr": 0.0036857321257003583,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.21556219115187622,
+      "epochs_run": 15,
+      "seconds": 25.08918760000961,
+      "is_spec_default": false
+    },
+    {
+      "trial": 15,
+      "arch": "lstm",
+      "lr": 0.004850859181621986,
+      "batch_size": 64,
+      "dropout": 0.1,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.07328354620651444,
+      "epochs_run": 11,
+      "seconds": 35.00626570000895,
+      "is_spec_default": false
+    },
+    {
+      "trial": 16,
+      "arch": "lstm",
+      "lr": 0.00014047909631078305,
+      "batch_size": 256,
+      "dropout": 0.5,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.04317471510155443,
+      "epochs_run": 15,
+      "seconds": 14.059488900005817,
+      "is_spec_default": false
+    },
+    {
+      "trial": 17,
+      "arch": "lstm",
+      "lr": 0.002561107362345826,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.08770320185500843,
+      "epochs_run": 15,
+      "seconds": 14.086724499997217,
+      "is_spec_default": false
+    },
+    {
+      "trial": 18,
+      "arch": "lstm",
+      "lr": 0.004559345162620435,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.1301057727376169,
+      "epochs_run": 15,
+      "seconds": 13.934730500011938,
+      "is_spec_default": false
+    },
+    {
+      "trial": 19,
+      "arch": "lstm",
+      "lr": 0.0005789256376730224,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.0683382856218171,
+      "epochs_run": 15,
+      "seconds": 14.249451199983014,
+      "is_spec_default": false
+    },
+    {
+      "trial": 20,
+      "arch": "lstm",
+      "lr": 0.0001434213093560108,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.08108273925196988,
+      "epochs_run": 15,
+      "seconds": 46.39379729999928,
+      "is_spec_default": false
+    },
+    {
+      "trial": 21,
+      "arch": "lstm",
+      "lr": 0.0008158492931137243,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.18225183773054945,
+      "epochs_run": 15,
+      "seconds": 96.58634089998668,
+      "is_spec_default": false
+    },
+    {
+      "trial": 22,
+      "arch": "lstm",
+      "lr": 0.0003303974174112225,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.07268562852447065,
+      "epochs_run": 15,
+      "seconds": 48.71379949999391,
+      "is_spec_default": false
+    },
+    {
+      "trial": 23,
+      "arch": "lstm",
+      "lr": 0.0018879216212602324,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.3081125889397597,
+      "epochs_run": 15,
+      "seconds": 47.03550159998122,
+      "is_spec_default": false
+    },
+    {
+      "trial": 24,
+      "arch": "lstm",
+      "lr": 0.0018535552712323172,
+      "batch_size": 64,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.11665137261031316,
+      "epochs_run": 15,
+      "seconds": 47.469190500007244,
+      "is_spec_default": false
+    },
+    {
+      "trial": 25,
+      "arch": "lstm",
+      "lr": 0.00031524655077433536,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.13996633028268507,
+      "epochs_run": 15,
+      "seconds": 94.21381409998867,
+      "is_spec_default": false
+    },
+    {
+      "trial": 26,
+      "arch": "lstm",
+      "lr": 0.0032146534419750924,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.2862394193648468,
+      "epochs_run": 15,
+      "seconds": 13.598544799984666,
+      "is_spec_default": false
+    },
+    {
+      "trial": 27,
+      "arch": "lstm",
+      "lr": 0.0007426875391598964,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.21235222828979403,
+      "epochs_run": 15,
+      "seconds": 26.06394129997352,
+      "is_spec_default": false
+    },
+    {
+      "trial": 28,
+      "arch": "lstm",
+      "lr": 0.0005863517713207004,
+      "batch_size": 64,
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.16539689585906614,
+      "epochs_run": 15,
+      "seconds": 49.913932100025704,
+      "is_spec_default": false
+    },
+    {
+      "trial": 29,
+      "arch": "lstm",
+      "lr": 0.004782560454855146,
+      "batch_size": 256,
+      "dropout": 0.1,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.14777532915448738,
+      "epochs_run": 15,
+      "seconds": 14.09563649998745,
+      "is_spec_default": false
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T00:42:36"
+}

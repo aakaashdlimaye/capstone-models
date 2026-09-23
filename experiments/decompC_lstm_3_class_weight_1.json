@@ -1,0 +1,48 @@
+{
+  "key": "decompC_lstm_3_class_weight_1",
+  "arch": "lstm",
+  "horizon": 3,
+  "treatment": "class_weight",
+  "seed": 1,
+  "tag": "decompC",
+  "note": "Model C: Altman's five ratios, 8-quarter LSTM",
+  "feature_cols": [
+    3,
+    9,
+    8,
+    13,
+    15
+  ],
+  "feature_names": [
+    "r04_wc_to_ta",
+    "r10_re_to_ta",
+    "r09_ebit_to_ta",
+    "r14_equity_to_liabilities",
+    "r16_asset_turnover"
+  ],
+  "want_attention": false,
+  "hparams": {
+    "lr": 0.0018879216212602324,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "data": {
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
+    "n_features": 5,
+    "with_indicators": false
+  },
+  "early_stopping": {
+    "monitor": "validation PR-AUC",
+    "patience": 10
+  },
+  "models_sha": "75f3e94",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T17:10:44"
+}

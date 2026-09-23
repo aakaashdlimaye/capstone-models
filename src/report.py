@@ -15,14 +15,28 @@ from . import config as C
 from . import utils as U
 
 
+MISSING: list[str] = []
+
+
 def _read(name: str) -> pd.DataFrame | None:
+    """Read a results table, recording anything absent or empty.
+
+    A full run should find every table.  Anything that lands in MISSING is a
+    hole in the report and is printed loudly rather than rendered as prose.
+    """
     p = C.RESULTS / name
     if not p.exists():
+        MISSING.append(f"{name} (absent)")
         return None
     try:
-        return pd.read_csv(p)
-    except Exception:
+        df = pd.read_csv(p)
+    except Exception as exc:
+        MISSING.append(f"{name} (unreadable: {exc})")
         return None
+    if df.empty:
+        MISSING.append(f"{name} (empty)")
+        return None
+    return df
 
 
 def _md(df: pd.DataFrame | None, cols: list[str] | None = None, nd: int = 4) -> str:
@@ -84,6 +98,7 @@ def provenance_manifest() -> Path:
 
 
 def build(full: bool = True) -> Path:
+    MISSING.clear()
     prov = U.provenance()
     L: list[str] = []
     A = L.append
@@ -229,6 +244,12 @@ def build(full: bool = True) -> Path:
         A("")
         A(f"![PR-AUC heatmap h={h}](../results/figures/imbalance_heatmap_h{h}.png)")
         A("")
+        A("PR-AUC is threshold-free, so only the four training treatments can move it.")
+        A("The cost-sensitive threshold changes where the untreated model's ranking is")
+        A("cut, which shows up in expected cost rather than in PR-AUC:")
+        A("")
+        A(f"![cost heatmap h={h}](../results/figures/imbalance_cost_heatmap_h{h}.png)")
+        A("")
 
     # ---------------------------------------------------------------- 5
     A("## 5. Protocol audit — reproducing the 91–99% accuracy")
@@ -242,6 +263,13 @@ def build(full: bool = True) -> Path:
            "f1_mean", "n_seeds"]))
     A("")
     A("### What each fix costs")
+    A("")
+    A("The decomposition is on PR-AUC.  Accuracy cannot carry it: it is high under")
+    A("the inflated protocol because the model separates a balanced test set, and high")
+    A("again under the correct protocol because the majority class is ~99% of it.  The")
+    A("two large, offsetting accuracy moves cancel, so `model_beats_majority_class` is")
+    A("the column that matters — where it is false, a model reporting >99% accuracy is")
+    A("losing to a constant that predicts no bankruptcy at all.")
     A("")
     A(_md(_read("protocol_audit_decomposition.csv")))
     A("")
@@ -341,7 +369,25 @@ def build(full: bool = True) -> Path:
       "[`leakage_audit.md`](leakage_audit.md).")
     A("")
 
+    if MISSING:
+        A("## Missing artefacts")
+        A("")
+        A("These tables were expected and not found, so the sections above are")
+        A("incomplete.  A full run should leave this list empty.")
+        A("")
+        for m in MISSING:
+            A(f"- `{m}`")
+        A("")
+
     out = C.REPORTS / "RESULTS.md"
     out.write_text("\n".join(L), encoding="utf-8")
+    man = provenance_manifest()
     print(f"[report] wrote {out}")
+    print(f"[report] wrote {man}")
+    if MISSING:
+        print(f"[report] WARNING: {len(MISSING)} expected tables missing:")
+        for m in MISSING:
+            print(f"           {m}")
+    else:
+        print("[report] every expected table was found")
     return out

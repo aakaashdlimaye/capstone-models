@@ -1,0 +1,168 @@
+{
+  "key": "bilstm_2_class_weight_1",
+  "arch": "bilstm",
+  "horizon": 2,
+  "treatment": "class_weight",
+  "seed": 1,
+  "tag": "",
+  "note": "",
+  "n_params": 52801,
+  "epochs_run": 20,
+  "best_epoch": 9,
+  "best_val_pr_auc": 0.19928360793504546,
+  "seconds": 22.998614899988752,
+  "device": "cuda",
+  "hparams": {
+    "lr": 0.0032146534419750924,
+    "batch_size": 256,
+    "dropout": 0.2,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "imbalance_stats": {
+    "applied": false,
+    "treatment": "class_weight",
+    "pos_weight": 210.2,
+    "w_pos": 105.6,
+    "w_neg": 0.5023786869647955,
+    "n": 86592,
+    "n_pos": 410,
+    "n_neg": 86182
+  },
+  "feature_cols": null,
+  "data": {
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
+    "n_features": 29,
+    "with_indicators": false
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 1.1608382377991038,
+      "val_pr_auc": 0.057204606047330506,
+      "val_roc_auc": 0.8796243498636841
+    },
+    {
+      "epoch": 1,
+      "train_loss": 0.952124618902439,
+      "val_pr_auc": 0.07611266682401889,
+      "val_roc_auc": 0.9002605630412718
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.8902546388523189,
+      "val_pr_auc": 0.05866982348602611,
+      "val_roc_auc": 0.9079032031693363
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.7601890366604305,
+      "val_pr_auc": 0.09392401365574998,
+      "val_roc_auc": 0.921012717618957
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.6711758249174289,
+      "val_pr_auc": 0.07753632356340594,
+      "val_roc_auc": 0.9178341604045881
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.5822350162976949,
+      "val_pr_auc": 0.07016657915813611,
+      "val_roc_auc": 0.9003168386916115
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.49559125879122784,
+      "val_pr_auc": 0.1306742415826661,
+      "val_roc_auc": 0.8811532847012271
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.5261679774113082,
+      "val_pr_auc": 0.11800563727423793,
+      "val_roc_auc": 0.906440714280387
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.3458334506218819,
+      "val_pr_auc": 0.13743857297827666,
+      "val_roc_auc": 0.8852091996449889
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.26884278877523327,
+      "val_pr_auc": 0.19928360793504546,
+      "val_roc_auc": 0.8946336760271831
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.2301423720580423,
+      "val_pr_auc": 0.19391872483939532,
+      "val_roc_auc": 0.8984183830175003
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.2062902795942466,
+      "val_pr_auc": 0.16119947851764915,
+      "val_roc_auc": 0.8767108984238072
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.2258532877243279,
+      "val_pr_auc": 0.1770116831735507,
+      "val_roc_auc": 0.8849532471389256
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.13074471416600264,
+      "val_pr_auc": 0.1470459359130161,
+      "val_roc_auc": 0.884246411410261
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.12455370579484826,
+      "val_pr_auc": 0.13029668811688053,
+      "val_roc_auc": 0.872118669752109
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.10974406420699949,
+      "val_pr_auc": 0.1156732025903992,
+      "val_roc_auc": 0.8807915610933206
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.08830555015727493,
+      "val_pr_auc": 0.13746163937701422,
+      "val_roc_auc": 0.882898507881642
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.0791176671199418,
+      "val_pr_auc": 0.14798872976022884,
+      "val_roc_auc": 0.8808386834752314
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.10373982657173873,
+      "val_pr_auc": 0.13677841531190732,
+      "val_roc_auc": 0.8915520756561709
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.09709999778053978,
+      "val_pr_auc": 0.12685816880526798,
+      "val_roc_auc": 0.8806257852317777
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T03:01:36"
+}

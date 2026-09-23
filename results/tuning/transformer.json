@@ -1,0 +1,422 @@
+{
+  "arch": "transformer",
+  "n_trials": 30,
+  "budget": {
+    "search_epochs": 15,
+    "search_patience": 5,
+    "final_epochs": 60,
+    "final_patience": 10,
+    "selection_metric": "validation PR-AUC",
+    "horizon": 4,
+    "treatment": "class_weight",
+    "seed": 1234
+  },
+  "space": {
+    "lr": [
+      "loguniform",
+      0.0001,
+      0.005
+    ],
+    "batch_size": [
+      "choice",
+      [
+        32,
+        64,
+        128,
+        256
+      ]
+    ],
+    "dropout": [
+      "choice",
+      [
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5
+      ]
+    ],
+    "weight_decay": [
+      "choice",
+      [
+        0.0,
+        1e-05,
+        0.0001,
+        0.001
+      ]
+    ]
+  },
+  "best": {
+    "lr": 0.0013216203701503452,
+    "batch_size": 32,
+    "dropout": 0.4,
+    "weight_decay": 0.0001
+  },
+  "best_val_pr_auc": 0.18211580057709303,
+  "spec_default_val_pr_auc": 0.12012677864249541,
+  "trials": [
+    {
+      "trial": 0,
+      "arch": "transformer",
+      "lr": 0.001,
+      "batch_size": 32,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.12012677864249541,
+      "epochs_run": 13,
+      "seconds": 154.16177979999338,
+      "is_spec_default": true
+    },
+    {
+      "trial": 1,
+      "arch": "transformer",
+      "lr": 0.004564399055840275,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.027790843085578405,
+      "epochs_run": 6,
+      "seconds": 28.83376949999365,
+      "is_spec_default": false
+    },
+    {
+      "trial": 2,
+      "arch": "transformer",
+      "lr": 0.00027836048114898324,
+      "batch_size": 256,
+      "dropout": 0.1,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.09490834893798072,
+      "epochs_run": 15,
+      "seconds": 74.52703259998816,
+      "is_spec_default": false
+    },
+    {
+      "trial": 3,
+      "arch": "transformer",
+      "lr": 0.0001587206606823287,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.051008882528863965,
+      "epochs_run": 15,
+      "seconds": 75.47750259999884,
+      "is_spec_default": false
+    },
+    {
+      "trial": 4,
+      "arch": "transformer",
+      "lr": 0.004344519184930514,
+      "batch_size": 64,
+      "dropout": 0.5,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.011288922004581444,
+      "epochs_run": 13,
+      "seconds": 80.37082339997869,
+      "is_spec_default": false
+    },
+    {
+      "trial": 5,
+      "arch": "transformer",
+      "lr": 0.000561379013614412,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.07701600017969665,
+      "epochs_run": 15,
+      "seconds": 92.3508817999973,
+      "is_spec_default": false
+    },
+    {
+      "trial": 6,
+      "arch": "transformer",
+      "lr": 0.0029342585157723557,
+      "batch_size": 256,
+      "dropout": 0.3,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.07056103203859412,
+      "epochs_run": 13,
+      "seconds": 64.82592850000947,
+      "is_spec_default": false
+    },
+    {
+      "trial": 7,
+      "arch": "transformer",
+      "lr": 0.0013216203701503452,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.18211580057709303,
+      "epochs_run": 15,
+      "seconds": 181.66495539998868,
+      "is_spec_default": false
+    },
+    {
+      "trial": 8,
+      "arch": "transformer",
+      "lr": 0.00019603575358382731,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.054730392006283886,
+      "epochs_run": 15,
+      "seconds": 180.61761789998855,
+      "is_spec_default": false
+    },
+    {
+      "trial": 9,
+      "arch": "transformer",
+      "lr": 0.0001265242511922246,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.1396564974521644,
+      "epochs_run": 15,
+      "seconds": 179.17440879999776,
+      "is_spec_default": false
+    },
+    {
+      "trial": 10,
+      "arch": "transformer",
+      "lr": 0.0010916947506150927,
+      "batch_size": 128,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.10366602894712182,
+      "epochs_run": 15,
+      "seconds": 78.44021420000354,
+      "is_spec_default": false
+    },
+    {
+      "trial": 11,
+      "arch": "transformer",
+      "lr": 0.004583536214102075,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.010861481484043168,
+      "epochs_run": 13,
+      "seconds": 80.92954230000032,
+      "is_spec_default": false
+    },
+    {
+      "trial": 12,
+      "arch": "transformer",
+      "lr": 0.00010123289633013626,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.05839131432521091,
+      "epochs_run": 15,
+      "seconds": 81.19426889999886,
+      "is_spec_default": false
+    },
+    {
+      "trial": 13,
+      "arch": "transformer",
+      "lr": 0.0028744152094248555,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.01855110168436965,
+      "epochs_run": 7,
+      "seconds": 43.82364509999752,
+      "is_spec_default": false
+    },
+    {
+      "trial": 14,
+      "arch": "transformer",
+      "lr": 0.0036857321257003583,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.016353767814410045,
+      "epochs_run": 6,
+      "seconds": 32.32785830000648,
+      "is_spec_default": false
+    },
+    {
+      "trial": 15,
+      "arch": "transformer",
+      "lr": 0.004850859181621986,
+      "batch_size": 64,
+      "dropout": 0.1,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.054559028591785554,
+      "epochs_run": 13,
+      "seconds": 78.91819530000794,
+      "is_spec_default": false
+    },
+    {
+      "trial": 16,
+      "arch": "transformer",
+      "lr": 0.00014047909631078305,
+      "batch_size": 256,
+      "dropout": 0.5,
+      "weight_decay": 1e-05,
+      "val_pr_auc": 0.056865478181881056,
+      "epochs_run": 15,
+      "seconds": 72.7936192000052,
+      "is_spec_default": false
+    },
+    {
+      "trial": 17,
+      "arch": "transformer",
+      "lr": 0.002561107362345826,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.06106818130045269,
+      "epochs_run": 8,
+      "seconds": 38.91174169999431,
+      "is_spec_default": false
+    },
+    {
+      "trial": 18,
+      "arch": "transformer",
+      "lr": 0.004559345162620435,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.06466795563101571,
+      "epochs_run": 9,
+      "seconds": 43.32217900000978,
+      "is_spec_default": false
+    },
+    {
+      "trial": 19,
+      "arch": "transformer",
+      "lr": 0.0005789256376730224,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.05484197698061077,
+      "epochs_run": 9,
+      "seconds": 43.369546300004004,
+      "is_spec_default": false
+    },
+    {
+      "trial": 20,
+      "arch": "transformer",
+      "lr": 0.0001434213093560108,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.11468883147826092,
+      "epochs_run": 15,
+      "seconds": 89.54848850000417,
+      "is_spec_default": false
+    },
+    {
+      "trial": 21,
+      "arch": "transformer",
+      "lr": 0.0008158492931137243,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.13607185175103984,
+      "epochs_run": 15,
+      "seconds": 179.3154297999863,
+      "is_spec_default": false
+    },
+    {
+      "trial": 22,
+      "arch": "transformer",
+      "lr": 0.0003303974174112225,
+      "batch_size": 64,
+      "dropout": 0.4,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.07808603555289804,
+      "epochs_run": 15,
+      "seconds": 90.9370079000073,
+      "is_spec_default": false
+    },
+    {
+      "trial": 23,
+      "arch": "transformer",
+      "lr": 0.0018879216212602324,
+      "batch_size": 64,
+      "dropout": 0.3,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.04301468605858573,
+      "epochs_run": 11,
+      "seconds": 66.09446999998181,
+      "is_spec_default": false
+    },
+    {
+      "trial": 24,
+      "arch": "transformer",
+      "lr": 0.0018535552712323172,
+      "batch_size": 64,
+      "dropout": 0.2,
+      "weight_decay": 0.001,
+      "val_pr_auc": 0.061062725956286604,
+      "epochs_run": 15,
+      "seconds": 90.51637189998291,
+      "is_spec_default": false
+    },
+    {
+      "trial": 25,
+      "arch": "transformer",
+      "lr": 0.00031524655077433536,
+      "batch_size": 32,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.1790547585168476,
+      "epochs_run": 15,
+      "seconds": 184.24332350000623,
+      "is_spec_default": false
+    },
+    {
+      "trial": 26,
+      "arch": "transformer",
+      "lr": 0.0032146534419750924,
+      "batch_size": 256,
+      "dropout": 0.2,
+      "weight_decay": 0.0,
+      "val_pr_auc": 0.051872553000553365,
+      "epochs_run": 7,
+      "seconds": 32.103051200014306,
+      "is_spec_default": false
+    },
+    {
+      "trial": 27,
+      "arch": "transformer",
+      "lr": 0.0007426875391598964,
+      "batch_size": 128,
+      "dropout": 0.4,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.09768452149492345,
+      "epochs_run": 15,
+      "seconds": 77.35174789998564,
+      "is_spec_default": false
+    },
+    {
+      "trial": 28,
+      "arch": "transformer",
+      "lr": 0.0005863517713207004,
+      "batch_size": 64,
+      "dropout": 0.2,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.14128087860641558,
+      "epochs_run": 15,
+      "seconds": 90.9920671999862,
+      "is_spec_default": false
+    },
+    {
+      "trial": 29,
+      "arch": "transformer",
+      "lr": 0.004782560454855146,
+      "batch_size": 256,
+      "dropout": 0.1,
+      "weight_decay": 0.0001,
+      "val_pr_auc": 0.028010599156526816,
+      "epochs_run": 6,
+      "seconds": 29.24599500000477,
+      "is_spec_default": false
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T01:46:32"
+}

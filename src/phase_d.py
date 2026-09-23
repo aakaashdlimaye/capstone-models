@@ -73,33 +73,39 @@ def ablation_table(scores) -> pd.DataFrame:
     return df.groupby(["horizon", "arch", "treatment"], dropna=False).agg(**agg).reset_index()
 
 
-def heatmap(table: pd.DataFrame, horizon: int, out_stem) -> None:
+def heatmap(table: pd.DataFrame, horizon: int, out_stem, metric: str = "pr_auc_mean",
+            treatments: list[str] | None = None, label: str | None = None,
+            lower_is_better: bool = False) -> None:
+    """architecture x treatment grid for one metric."""
     import matplotlib.pyplot as plt
 
     sub = table[table["horizon"] == horizon]
-    treatments = [t for t in C.TREATMENTS] + \
-                 [f"cost_threshold_1to{r}" for r in C.COST_RATIOS]
-    treatments = [t for t in treatments if t in set(sub["treatment"])]
+    treatments = [t for t in (treatments or list(C.TREATMENTS)) if t in set(sub["treatment"])]
     archs = list(C.ARCHITECTURES)
     Z = np.full((len(archs), len(treatments)), np.nan)
     for i, a in enumerate(archs):
         for j, t in enumerate(treatments):
-            v = sub.query("arch == @a and treatment == @t")["pr_auc_mean"]
+            v = sub.query("arch == @a and treatment == @t")[metric]
             if len(v):
                 Z[i, j] = float(v.iloc[0])
 
-    fig, ax = plt.subplots(figsize=(1.25 * len(treatments) + 3, 0.75 * len(archs) + 2.2))
-    im = ax.imshow(Z, cmap="viridis", aspect="auto")
+    fig, ax = plt.subplots(figsize=(1.35 * len(treatments) + 3.4, 0.8 * len(archs) + 2.4))
+    im = ax.imshow(Z, cmap="viridis_r" if lower_is_better else "viridis", aspect="auto")
     ax.set_xticks(range(len(treatments)), treatments, rotation=35, ha="right")
     ax.set_yticks(range(len(archs)), archs)
+    lo, hi = np.nanmin(Z), np.nanmax(Z)
+    mid = lo + 0.6 * (hi - lo) if hi > lo else hi
     for i in range(len(archs)):
         for j in range(len(treatments)):
             if np.isfinite(Z[i, j]):
-                ax.text(j, i, f"{Z[i, j]:.3f}", ha="center", va="center",
-                        color="white" if Z[i, j] < np.nanmax(Z) * 0.6 else "black", fontsize=9)
-    ax.set_title(f"Test PR-AUC by architecture and imbalance treatment (h={horizon}, "
-                 f"mean of {len(C.SEEDS)} seeds)")
-    fig.colorbar(im, ax=ax, label="PR-AUC")
+                dark = (Z[i, j] > mid) if lower_is_better else (Z[i, j] < mid)
+                ax.text(j, i, f"{Z[i, j]:.4f}", ha="center", va="center",
+                        color="white" if dark else "black", fontsize=8)
+    name = label or metric
+    ax.set_title(f"Test {name} by architecture and imbalance treatment\n"
+                 f"h={horizon}, mean of {len(C.SEEDS)} seeds"
+                 + ("  (lower is better)" if lower_is_better else ""))
+    fig.colorbar(im, ax=ax, label=name)
     U.savefig(fig, out_stem)
 
 
@@ -116,8 +122,18 @@ def _pooled(splits) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
 
 
 def protocol_audit(splits, horizons=AUDIT_HORIZONS, seeds=C.SEEDS,
-                   arch: str = "lstm") -> pd.DataFrame:
-    """Three protocols, one architecture, side by side."""
+                   arch: str = "lstm", force: bool = False) -> pd.DataFrame:
+    """Three protocols, one architecture, side by side.
+
+    These runs deliberately break the protocol, so they do not go through
+    `run_deep` and leave no run record -- nothing they produce can reach a
+    reported table by accident.  They get their own result cache instead.
+    """
+    cache = C.RESULTS / "protocol_audit_runs.csv"
+    if cache.exists() and not force:
+        print(f"[phase D] reusing {cache.name}")
+        return pd.read_csv(cache)
+
     hp = Tune.best_hparams(arch)
     Xp, Yp, SPp = _pooled(splits)
     rows = []
@@ -191,23 +207,42 @@ def audit_summary(audit: pd.DataFrame) -> pd.DataFrame:
     agg["_o"] = agg["protocol"].map(order)
     agg = agg.sort_values(["horizon", "_o"]).drop(columns="_o").reset_index(drop=True)
 
-    # How much of the accuracy drop does each fix account for?
+    # The decomposition is on PR-AUC, not accuracy.  Accuracy cannot carry it:
+    # it is high under the inflated protocol because the model separates a
+    # balanced test set, and high again under the correct protocol because the
+    # majority class is 99% of it.  The two large, offsetting accuracy moves
+    # leave a near-zero net, so any "share of the accuracy drop" divides by
+    # almost nothing.  Accuracy is reported here as the diagnostic instead —
+    # against the majority-class baseline that beats the model outright.
     out = []
     for h, g in agg.groupby("horizon"):
         g = g.set_index("protocol")
-        a_inf = g.loc["inflated", "accuracy_mean"]
-        a_half = g.loc["half_fixed", "accuracy_mean"]
-        a_cor = g.loc["correct", "accuracy_mean"]
-        total = a_inf - a_cor
-        out.append({"horizon": h, "inflated_accuracy": a_inf,
-                    "half_fixed_accuracy": a_half, "correct_accuracy": a_cor,
-                    "drop_from_chronological_split": a_inf - a_half,
-                    "drop_from_resampling_inside_train": a_half - a_cor,
-                    "total_drop": total,
-                    "share_chronological": (a_inf - a_half) / total if total else np.nan,
-                    "share_resampling": (a_half - a_cor) / total if total else np.nan,
-                    "correct_pr_auc": g.loc["correct", "pr_auc_mean"],
-                    "inflated_pr_auc": g.loc["inflated", "pr_auc_mean"]})
+        base = g.loc["correct", "test_positive_rate"]
+        p_inf = g.loc["inflated", "pr_auc_mean"]
+        p_half = g.loc["half_fixed", "pr_auc_mean"]
+        p_cor = g.loc["correct", "pr_auc_mean"]
+        d_split, d_resample = p_inf - p_half, p_half - p_cor
+        total_abs = abs(d_split) + abs(d_resample)
+        out.append({
+            "horizon": h,
+            "inflated_pr_auc": p_inf,
+            "half_fixed_pr_auc": p_half,
+            "correct_pr_auc": p_cor,
+            "pr_auc_lost_to_chronological_split": d_split,
+            "pr_auc_lost_to_resampling_inside_train": d_resample,
+            "total_pr_auc_collapse": p_inf - p_cor,
+            "share_chronological_split": abs(d_split) / total_abs if total_abs else np.nan,
+            "share_resampling_inside_train": abs(d_resample) / total_abs if total_abs else np.nan,
+            "inflated_over_correct_pr_auc": p_inf / p_cor if p_cor else np.nan,
+            # The diagnostic: what accuracy says about the same three runs.
+            "inflated_accuracy": g.loc["inflated", "accuracy_mean"],
+            "half_fixed_accuracy": g.loc["half_fixed", "accuracy_mean"],
+            "correct_accuracy": g.loc["correct", "accuracy_mean"],
+            "correct_test_base_rate": base,
+            "majority_class_accuracy": 1.0 - base,
+            "model_beats_majority_class": bool(g.loc["correct", "accuracy_mean"] > 1.0 - base),
+            "correct_pr_auc_over_base_rate": p_cor / base if base else np.nan,
+        })
     return agg, pd.DataFrame(out)
 
 
@@ -224,10 +259,19 @@ def main(full: bool = True, seeds=C.SEEDS, horizons=AUDIT_HORIZONS,
     for h in horizons:
         sub = table[table["horizon"] == h]
         U.write_table(sub, C.RESULTS / f"imbalance_ablation_h{h}")
-        heatmap(table, h, C.FIGURES / f"imbalance_heatmap_h{h}")
+        # PR-AUC is threshold-free, so only the four training treatments can
+        # move it; the cost-threshold rows share the untreated model's ranking
+        # and differ only in where they cut it.  They get their own cost grid.
+        heatmap(table, h, C.FIGURES / f"imbalance_heatmap_h{h}",
+                metric="pr_auc_mean", label="PR-AUC")
+        heatmap(table, h, C.FIGURES / f"imbalance_cost_heatmap_h{h}",
+                metric="cost_1to20_mean", label="expected cost per window at 20:1",
+                treatments=list(C.TREATMENTS)
+                + [f"cost_threshold_1to{r}" for r in C.COST_RATIOS],
+                lower_is_better=True)
     table.to_csv(C.RESULTS / "imbalance_ablation_all.csv", index=False)
 
-    audit = protocol_audit(splits, horizons=horizons, seeds=seeds)
+    audit = protocol_audit(splits, horizons=horizons, seeds=seeds, force=force)
     audit.to_csv(C.RESULTS / "protocol_audit_runs.csv", index=False)
     agg, decomp = audit_summary(audit)
     U.write_table(agg, C.RESULTS / "protocol_audit")

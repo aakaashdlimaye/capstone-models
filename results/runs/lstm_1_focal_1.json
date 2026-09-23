@@ -1,0 +1,164 @@
+{
+  "key": "lstm_1_focal_1",
+  "arch": "lstm",
+  "horizon": 1,
+  "treatment": "focal",
+  "seed": 1,
+  "tag": "",
+  "note": "",
+  "n_params": 37409,
+  "epochs_run": 20,
+  "best_epoch": 9,
+  "best_val_pr_auc": 0.1489097315653684,
+  "seconds": 71.84194399998523,
+  "device": "cuda",
+  "hparams": {
+    "lr": 0.0018879216212602324,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "imbalance_stats": {
+    "applied": false,
+    "treatment": "focal",
+    "gamma": 2.0,
+    "alpha": 0.25
+  },
+  "feature_cols": null,
+  "data": {
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
+    "n_features": 29,
+    "with_indicators": false
+  },
+  "history": [
+    {
+      "epoch": 0,
+      "train_loss": 0.003047687603822921,
+      "val_pr_auc": 0.02813800581587688,
+      "val_roc_auc": 0.8536108560138935
+    },
+    {
+      "epoch": 1,
+      "train_loss": 0.001321206159796084,
+      "val_pr_auc": 0.08155559706936895,
+      "val_roc_auc": 0.9121384565225581
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.001188224540845782,
+      "val_pr_auc": 0.04573483287061596,
+      "val_roc_auc": 0.9136387312481897
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.001053758224380166,
+      "val_pr_auc": 0.059553116029930714,
+      "val_roc_auc": 0.9186851098707687
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.0009459231574713347,
+      "val_pr_auc": 0.07609717611579826,
+      "val_roc_auc": 0.9175082709950784
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.0007900369669539965,
+      "val_pr_auc": 0.10418282221292399,
+      "val_roc_auc": 0.9091560922194845
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.0007456593925831323,
+      "val_pr_auc": 0.13367493294451643,
+      "val_roc_auc": 0.8982657863323025
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.0006284398761222033,
+      "val_pr_auc": 0.11599882083884237,
+      "val_roc_auc": 0.9030380887928828
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.0005369018997338994,
+      "val_pr_auc": 0.08523683036973302,
+      "val_roc_auc": 0.8700177564982678
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.0004426910537133284,
+      "val_pr_auc": 0.1489097315653684,
+      "val_roc_auc": 0.8916152178515807
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.0003987037509966143,
+      "val_pr_auc": 0.14021728050907792,
+      "val_roc_auc": 0.8803612090006092
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.0003420437210503104,
+      "val_pr_auc": 0.055371332470813925,
+      "val_roc_auc": 0.8437070944159905
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.0003170567314799239,
+      "val_pr_auc": 0.12689229527448287,
+      "val_roc_auc": 0.8273592956632319
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.00024523747381420373,
+      "val_pr_auc": 0.13769753372776863,
+      "val_roc_auc": 0.7791647561436574
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.00024269357136418355,
+      "val_pr_auc": 0.06505209875117397,
+      "val_roc_auc": 0.7647088622721823
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.0001781352872066117,
+      "val_pr_auc": 0.07762043405845993,
+      "val_roc_auc": 0.8131073352393101
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.00021312519610588936,
+      "val_pr_auc": 0.08034694047394088,
+      "val_roc_auc": 0.8376352033294407
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.00020409531269087583,
+      "val_pr_auc": 0.08849924993273792,
+      "val_roc_auc": 0.8441727641035566
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.00015045956867497143,
+      "val_pr_auc": 0.08840212661503226,
+      "val_roc_auc": 0.8818614837262407
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.0002005807311994802,
+      "val_pr_auc": 0.09446897793388011,
+      "val_roc_auc": 0.7833863084019282
+    }
+  ],
+  "models_sha": "d45fdcc",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-18T07:32:59"
+}
