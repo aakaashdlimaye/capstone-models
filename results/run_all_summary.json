@@ -39,6 +39,7 @@
     },
     "h": {
       "h1_rows": 4,
+      "h1b_rows": 4,
       "h2_rows": 4,
       "h3_rows": 20,
       "precision_at_k_rows": 160,
@@ -54,7 +55,7 @@
     4
   ],
   "tuning_trials": 30,
-  "wall_seconds_total": 18758.30947789998,
+  "wall_seconds_total": 22211.12867569996,
   "invocations": [
     {
       "phases": [
@@ -172,9 +173,45 @@
       "models_sha": "85c3df3",
       "dataset_sha": "b16eb17",
       "timestamp": "2026-09-25T05:49:39"
+    },
+    {
+      "phases": [
+        "h",
+        "audit",
+        "report"
+      ],
+      "wall_seconds": 3450.8917824999953,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "5a5a82c",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-25T20:59:10"
+    },
+    {
+      "phases": [
+        "report"
+      ],
+      "wall_seconds": 1.9274152999860235,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "5a5a82c",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-25T21:01:32"
     }
   ],
-  "models_sha": "85c3df3",
+  "models_sha": "5a5a82c",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-25T05:49:39"
+  "timestamp": "2026-09-25T21:01:32"
 }

@@ -2,7 +2,13 @@
   "key": "decompC_xgb_3",
   "model": "xgboost",
   "horizon": 3,
-  "seed": 0,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
   "feature_cols": [
     3,
     9,
@@ -24,7 +30,8 @@
     "min_child_weight": 5.0
   },
   "note": "Altman's five ratios across all eight quarters (40 inputs)",
-  "models_sha": "85c3df3",
+  "aggregation": "per-seed fits plus their seed-averaged ensemble",
+  "models_sha": "5a5a82c",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-25T02:20:11"
+  "timestamp": "2026-09-25T18:12:45"
 }

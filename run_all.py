@@ -82,7 +82,7 @@ def main(argv=None) -> int:
         out["a"] = phase_a.main(full=full)
     if "b" in todo:
         from src import phase_b
-        out["b"] = phase_b.main(full=full, n_trials=trials, force=a.force)
+        out["b"] = phase_b.main(full=full, n_trials=trials, seeds=seeds, force=a.force)
     if "c" in todo:
         from src import phase_c
         out["c"] = phase_c.main(full=full, seeds=seeds, n_trials=trials, force=a.force)

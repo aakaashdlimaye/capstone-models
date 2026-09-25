@@ -78,6 +78,14 @@ def model_predictions(name: str, h: int, seeds=C.SEEDS) -> dict | None:
 # --------------------------------------------------------------------------
 # H1 / H2 — the two missing controls
 # --------------------------------------------------------------------------
+# r21..r24 are year-on-year growth ratios, so a single t-0 row already encodes a
+# four-quarter comparison.  If that is why the eight-quarter window buys the tree
+# nothing, removing them should hurt the t-0 model more than the window model and
+# open up the gap between them.
+GROWTH_IDX = [20, 21, 22, 23]                       # r21..r24
+NON_GROWTH_IDX = [i for i in range(C.N_FEATURES) if i not in GROWTH_IDX]
+
+
 def h1_temporal_control(splits, horizons=C.HORIZONS, n_trials: int = C.TUNING_TRIALS,
                         force: bool = False) -> pd.DataFrame:
     """Does the eight-quarter window buy the best model anything?
@@ -112,6 +120,76 @@ def h1_temporal_control(splits, horizons=C.HORIZONS, n_trials: int = C.TUNING_TR
             "roc_auc_cluster_p": cmp["roc_auc_cluster_p"],
             "window_helps": bool(cmp["pr_auc_cluster_ci_low"] > 0),
             "n_clusters": cmp["n_clusters"],
+        })
+    return pd.DataFrame(rows)
+
+
+def h1b_growth_ratio_explanation(splits, horizons=C.HORIZONS,
+                                 n_trials: int = C.TUNING_TRIALS,
+                                 seeds=C.SEEDS, force: bool = False) -> pd.DataFrame:
+    """Why does the eight-quarter window buy the tree so little?
+
+    A candidate explanation: four of the 29 ratios (r21 revenue growth, r22 net
+    income growth, r23 assets growth, r24 equity growth) are year-on-year, so a
+    single t-0 row already carries a four-quarter comparison.  The window would
+    then be re-supplying history the t-0 model already has.
+
+    The test is to drop those four and repeat the comparison.  If the
+    explanation holds, removing them should cost the t-0 model more than the
+    window model, and the window-minus-t0 gap should widen.
+    """
+    rows = []
+    for h in horizons:
+        TAB.run_tabular("xgb_t0_25", h, splits, model="xgboost",
+                        feature_cols=NON_GROWTH_IDX, t0_only=True,
+                        with_indicators=True, seeds=seeds, n_trials=n_trials,
+                        force=force, note="25 ratios at t-0, year-on-year growth removed")
+        TAB.run_tabular("xgb_win_25", h, splits, model="xgboost",
+                        feature_cols=NON_GROWTH_IDX, t0_only=False,
+                        with_indicators=True, seeds=seeds, n_trials=n_trials,
+                        force=force, note="25 ratios x 8 quarters, growth removed")
+
+        full_t0 = model_predictions("xgb_t0_29", h)
+        full_win = model_predictions("xgboost", h, seeds)
+        no_t0 = E.load_preds(f"xgb_t0_25_{h}", "test")
+        no_win = E.load_preds(f"xgb_win_25_{h}", "test")
+        if full_t0 is None or full_win is None:
+            continue
+        y, g = full_win["y"], full_win["groups"]
+
+        gap_with = M.cluster_bootstrap_diff(y, full_t0["p"], full_win["p"], g,
+                                            n_boot=N_BOOT)
+        gap_without = M.cluster_bootstrap_diff(y, no_t0["p_hat"].to_numpy(),
+                                               no_win["p_hat"].to_numpy(), g,
+                                               n_boot=N_BOOT)
+        t0_cost = M.cluster_bootstrap_diff(y, no_t0["p_hat"].to_numpy(), full_t0["p"], g,
+                                           n_boot=N_BOOT)
+        win_cost = M.cluster_bootstrap_diff(y, no_win["p_hat"].to_numpy(), full_win["p"], g,
+                                            n_boot=N_BOOT)
+        rows.append({
+            "horizon": h,
+            "t0_29_pr_auc": M.pr_auc(y, full_t0["p"]),
+            "t0_25_pr_auc": M.pr_auc(y, no_t0["p_hat"].to_numpy()),
+            "window_29_pr_auc": M.pr_auc(y, full_win["p"]),
+            "window_25_pr_auc": M.pr_auc(y, no_win["p_hat"].to_numpy()),
+            # What the growth ratios are worth to each model.
+            "growth_worth_to_t0": t0_cost["diff"],
+            "growth_worth_to_t0_ci_low": t0_cost["ci_low"],
+            "growth_worth_to_t0_ci_high": t0_cost["ci_high"],
+            "growth_worth_to_window": win_cost["diff"],
+            "growth_worth_to_window_ci_low": win_cost["ci_low"],
+            "growth_worth_to_window_ci_high": win_cost["ci_high"],
+            # The window's value, with and without the growth ratios present.
+            "window_gap_with_growth": gap_with["diff"],
+            "window_gap_with_growth_ci_low": gap_with["ci_low"],
+            "window_gap_with_growth_ci_high": gap_with["ci_high"],
+            "window_gap_without_growth": gap_without["diff"],
+            "window_gap_without_growth_ci_low": gap_without["ci_low"],
+            "window_gap_without_growth_ci_high": gap_without["ci_high"],
+            "gap_widens_without_growth": bool(gap_without["diff"] > gap_with["diff"]),
+            "growth_worth_more_to_t0": bool(t0_cost["diff"] > win_cost["diff"]),
+            "supports_explanation": bool(gap_without["diff"] > gap_with["diff"]
+                                         and t0_cost["diff"] > win_cost["diff"]),
         })
     return pd.DataFrame(rows)
 
@@ -264,15 +342,25 @@ def h5_calibration(horizons=C.HORIZONS, seeds=C.SEEDS,
             if d is None:
                 continue
             p = d["p"]
-            # Altman is a score, not a probability; squash it to [0, 1] before
-            # asking whether it is calibrated, and say so in the table.
             is_prob = bool(np.all((p >= 0) & (p <= 1)))
-            pp = p if is_prob else M.logistic_scale(p)
+            if is_prob:
+                pp, how = p, "native probability"
+            else:
+                # Altman, Ohlson and Zmijewski emit scores, not probabilities.
+                # Asking whether a raw Z is "calibrated" is meaningless -- it
+                # produced an ECE of 0.49, which says only that a Z-score is not
+                # a probability.  The fair question is whether the score's
+                # *ranking* can be turned into calibrated probabilities, so it
+                # is Platt-scaled: a one-variable logistic fitted on validation
+                # scores and applied once to test.  Monotone, so every ranking
+                # metric is untouched, and fitted on val only.
+                pp = M.platt_scale(d["yv"], d["pv"], p)
+                how = "Platt-scaled on validation"
             tab, st = M.calibration(d["y"], pp)
             tab["horizon"] = h; tab["model"] = name
             tables.append(tab)
             summary.append({"horizon": h, "model": name, "is_probability": is_prob,
-                            "base_rate": float(d["y"].mean()),
+                            "scaling": how, "base_rate": float(d["y"].mean()),
                             "mean_predicted": float(pp.mean()), **st})
     return pd.DataFrame(summary), pd.concat(tables, ignore_index=True) if tables else pd.DataFrame()
 
@@ -405,6 +493,14 @@ def main(full: bool = True, horizons=C.HORIZONS, seeds=C.SEEDS,
                   "pr_auc_cluster_ci_low", "pr_auc_cluster_ci_high",
                   "window_helps"]].round(4).to_string(index=False))
 
+    h1b = h1b_growth_ratio_explanation(splits, horizons=horizons, seeds=seeds,
+                                       n_trials=n_trials, force=force)
+    U.write_table(h1b, C.RESULTS / "h1b_growth_ratio_explanation")
+    if len(h1b):
+        print(h1b[["horizon", "window_gap_with_growth", "window_gap_without_growth",
+                   "growth_worth_to_t0", "growth_worth_to_window",
+                   "supports_explanation"]].round(4).to_string(index=False))
+
     h2 = h2_static_deep_control(splits, horizons=horizons, seeds=seeds,
                                 n_trials=n_trials, force=force)
     U.write_table(h2, C.RESULTS / "h2_static_deep_control")
@@ -433,5 +529,5 @@ def main(full: bool = True, horizons=C.HORIZONS, seeds=C.SEEDS,
     n_reported = int((sector["status"] == "reported").sum()) if len(sector) else 0
     print(f"[phase H] sectors with >= {MIN_POSITIVES} test positives: {n_reported} "
           f"of {len(sector)} model-sector cells")
-    return {"h1_rows": len(h1), "h2_rows": len(h2), "h3_rows": len(h3),
+    return {"h1_rows": len(h1), "h1b_rows": len(h1b), "h2_rows": len(h2), "h3_rows": len(h3),
             "precision_at_k_rows": len(pk), "sector_cells_reported": n_reported}

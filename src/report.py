@@ -109,6 +109,154 @@ def imbalance_narrative(t: pd.DataFrame, horizon: int) -> list[str]:
     return out
 
 
+README_START = "<!-- FINDINGS:START -->"
+README_END = "<!-- FINDINGS:END -->"
+
+
+def _fmt_ci(lo, hi) -> str:
+    return f"[{lo:+.4f}, {hi:+.4f}]"
+
+
+def readme_findings() -> list[str]:
+    """The README's headline section, generated from the CSVs.
+
+    It was hand-written, and after the review fixes it quoted a decomposition
+    that no longer existed.  Generating it means it cannot contradict
+    `reports/RESULTS.md` again.
+    """
+    L = ["_Generated from the CSVs in `results/` by `src/report.py`; do not edit "
+         "by hand._", ""]
+
+    base = _read("baselines_all.csv")
+    deep = _read("deep_all.csv")
+    if base is not None and deep is not None:
+        b4 = base[base["horizon"] == 4].set_index("model")
+        d4 = deep[deep["horizon"] == 4].set_index("arch")
+        best_ml = b4[b4["family"] == "ml"]["pr_auc"].idxmax()
+        best_deep = d4["pr_auc_ensemble"].idxmax()
+        L += [f"**{best_ml} on the flattened window has the highest PR-AUC of any model "
+              f"here** — {b4.loc[best_ml, 'pr_auc']:.4f} at h=4, against the best neural "
+              f"model's ({best_deep}) {d4.loc[best_deep, 'pr_auc_ensemble']:.4f}, and "
+              f"Altman Z″'s {b4.loc['altman_zdp', 'pr_auc']:.4f}. Same row set, same "
+              f"split, same 30-trial tuning budget, and both are five-seed ensembles.", ""]
+        rows = [{"model": a, "PR-AUC (ensemble)": d4.loc[a, "pr_auc_ensemble"],
+                 "PR-AUC (per-seed mean +/- std)":
+                     U.fmt_ms(d4.loc[a, "pr_auc_mean"], d4.loc[a, "pr_auc_std"]),
+                 "ROC-AUC (ensemble)": d4.loc[a, "roc_auc_ensemble"]}
+                for a in d4.sort_values("pr_auc_ensemble", ascending=False).index]
+        L += ["Temporal architectures at h=4:", "",
+              U.to_markdown(pd.DataFrame(rows)), ""]
+
+    h1 = _read("h1_temporal_control.csv")
+    if h1 is not None:
+        helps = h1[h1["window_helps"]]
+        L += ["**Does the eight-quarter window help the best model?** Not measurably. "
+              f"The window minus t-0 difference for {best_ml if base is not None else 'XGBoost'} "
+              f"is {h1['window_minus_t0_pr_auc'].min():+.4f} to "
+              f"{h1['window_minus_t0_pr_auc'].max():+.4f} PR-AUC across the four horizons, "
+              f"and the firm-clustered interval contains zero at "
+              f"{len(h1) - len(helps)} of {len(h1)} horizons.", "",
+              _md(h1, ["horizon", "t0_pr_auc", "window_pr_auc",
+                       "window_minus_t0_pr_auc", "pr_auc_cluster_ci_low",
+                       "pr_auc_cluster_ci_high", "pr_auc_cluster_p",
+                       "window_helps"]), ""]
+
+    h1b = _read("h1b_growth_ratio_explanation.csv")
+    if h1b is not None:
+        n_sup = int(h1b["supports_explanation"].sum())
+        L += [f"**Why?** Four of the 29 ratios are year-on-year growth, so a single t-0 "
+              f"row already carries a four-quarter comparison. Dropping r21–r24 and "
+              f"repeating the comparison supports that reading at {n_sup} of "
+              f"{len(h1b)} horizons.", "",
+              _md(h1b, ["horizon", "window_gap_with_growth",
+                        "window_gap_without_growth", "growth_worth_to_t0",
+                        "growth_worth_to_window", "supports_explanation"]), ""]
+
+    sh = _read("decomposition_shares.csv")
+    if sh is not None:
+        r = sh[sh["horizon"] == 4].iloc[0]
+        steps = [c[len("pr_auc_share_"):] for c in sh.columns
+                 if c.startswith("pr_auc_share_")]
+        parts = ", ".join(
+            f"{r[f'pr_auc_share_{s}'] * 100:.0f}% {s} ({r[f'pr_auc_gap_{s}']:+.4f})"
+            for s in steps)
+        L += ["**The decomposition.** At h=4, of the "
+              f"{r['pr_auc_total_abs_movement']:.4f} of total movement from Altman Z″ "
+              f"to the full temporal model: {parts}.", ""]
+
+    dcm = _read("decomposition_all.csv")
+    if dcm is not None:
+        s4 = dcm[(dcm["horizon"] == 4) & dcm["step"].notna()]
+        L += ["Each step with its firm-clustered interval:", "",
+              U.to_markdown(pd.DataFrame({
+                  "step": s4["step"], "cause": s4.get("cause", ""),
+                  "PR-AUC change": s4["pr_auc_diff"],
+                  "95% CI": [_fmt_ci(a, b) for a, b in
+                             zip(s4["pr_auc_cluster_ci_low"], s4["pr_auc_cluster_ci_high"])],
+                  "excludes 0": s4["pr_auc_cluster_excludes_zero"]})), ""]
+
+    pa = _read("protocol_audit.csv")
+    pad = _read("protocol_audit_decomposition.csv")
+    if pa is not None and pad is not None:
+        g = pa[pa["horizon"] == 1].set_index("protocol")
+        d = pad[pad["horizon"] == 1].iloc[0]
+        L += ["**The protocol audit.** The same LSTM at h=1, scored at matched base "
+              f"rates: PR-AUC {g.loc['inflated_natural_test', 'pr_auc_mean']:.4f} under the "
+              f"inflated protocol against {g.loc['correct', 'pr_auc_mean']:.4f} under the "
+              f"correct one — a "
+              f"{g.loc['inflated_natural_test', 'pr_auc_mean'] / g.loc['correct', 'pr_auc_mean']:.0f}x "
+              f"collapse, with both scored on real windows at a "
+              f"{g.loc['correct', 'test_positive_rate']:.4f} base rate. On ROC-AUC, which "
+              f"is base-rate invariant, "
+              f"{d['share_resampling_inside_train'] * 100:.0f}% of the loss is the "
+              f"resampling order and {d['share_chronological_split'] * 100:.0f}% the split.",
+              "",
+              f"The same model reports {d['correct_accuracy']:.4f} accuracy and "
+              f"{'beats' if d['model_beats_majority_class'] else 'loses to'} a constant "
+              f"predicting no bankruptcy ({d['majority_class_accuracy']:.4f}).", ""]
+
+    pk = _read("h4_precision_at_k.csv")
+    if pk is not None:
+        s = pk[(pk["horizon"] == 4) & (pk["level"] == "firm") & (pk["budget"] == "k=50")]
+        L += ["**What a practitioner gets.** Of the 50 riskiest firms at h=4:", "",
+              _md(s, ["model", "tp", "n_positive", "precision", "recall", "lift"]), ""]
+
+    cal = _read("h5_calibration.csv")
+    if cal is not None:
+        c4 = cal[cal["horizon"] == 4]
+        L += ["**Calibration** (scores are Platt-scaled on validation where they are "
+              "not already probabilities):", "",
+              _md(c4, ["model", "scaling", "base_rate", "mean_predicted", "brier", "ece"],
+                  nd=5), ""]
+
+    size = _read("h6_size_breakdown.csv")
+    if size is not None:
+        s4 = size[(size["horizon"] == 4) & (size["status"] == "reported")]
+        if len(s4):
+            piv = s4.pivot_table(index="model", columns="group", values="pr_auc")
+            cols = [c for c in ("small", "mid", "large") if c in piv.columns]
+            L += ["**Who it works for.** PR-AUC at h=4 by total-assets tercile "
+                  "(cut on the train period):", "",
+                  U.to_markdown(piv[cols].reset_index()), ""]
+
+    return L
+
+
+def update_readme_findings() -> bool:
+    """Replace the generated block in README.md between its markers."""
+    path = C.REPO / "README.md"
+    if not path.exists():
+        return False
+    txt = path.read_text(encoding="utf-8")
+    if README_START not in txt or README_END not in txt:
+        return False
+    head, rest = txt.split(README_START, 1)
+    _, tail = rest.split(README_END, 1)
+    body = "\n".join(readme_findings())
+    path.write_text(f"{head}{README_START}\n{body}\n{README_END}{tail}", encoding="utf-8")
+    return True
+
+
 def provenance_manifest() -> Path:
     """One record per produced artefact, stamped with both repositories' SHAs.
 
@@ -146,6 +294,17 @@ WATCHED = {
 }
 CHANGE_THRESHOLD = 0.10       # relative
 
+# Wall-clock and row counts are not results.  Adding five seeds multiplied every
+# fit time by five, which buried the handful of metrics that actually moved
+# under twenty rows of timing noise.
+NOT_A_RESULT = ("seconds", "epochs", "n_", "wall_")
+NOT_A_RESULT_EXACT = {"n", "tn", "fp", "fn", "tp", "k", "seed", "trial", "bin",
+                      "horizon", "threshold"}
+
+
+def _is_result_column(c: str) -> bool:
+    return not (c in NOT_A_RESULT_EXACT or c.startswith(NOT_A_RESULT))
+
 
 def _snapshot() -> dict:
     """Every watched metric, keyed so the next run can diff against it."""
@@ -158,7 +317,8 @@ def _snapshot() -> dict:
         if not set(keys) <= set(df.columns):
             continue
         num = [c for c in df.columns
-               if pd.api.types.is_numeric_dtype(df[c]) and c not in keys]
+               if pd.api.types.is_numeric_dtype(df[c]) and c not in keys
+               and _is_result_column(c)]
         for _, r in df.iterrows():
             rid = " / ".join(str(r[k]) for k in keys)
             for c in num:
@@ -505,6 +665,8 @@ def build(full: bool = True) -> Path:
     out = C.REPORTS / "RESULTS.md"
     out.write_text("\n".join(L), encoding="utf-8")
     man = provenance_manifest()
+    if update_readme_findings():
+        print("[report] regenerated README.md section 9 from the CSVs")
     print(f"[report] wrote {out}")
     print(f"[report] wrote {man}")
     if MISSING:

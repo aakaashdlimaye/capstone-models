@@ -324,7 +324,7 @@
 | 2 | xgboost | SIC-2 | 25 | 199 | 0 | 0.0000 | 18 |  |  |  |  | too few (0 test positives, need 20) |
 | 2 | xgboost | SIC-2 | 26 | 216 | 0 | 0.0000 | 20 |  |  |  |  | too few (0 test positives, need 20) |
 | 2 | xgboost | SIC-2 | 27 | 128 | 0 | 0.0000 | 11 |  |  |  |  | too few (0 test positives, need 20) |
-| 2 | xgboost | SIC-2 | 28 | 4357 | 31 | 0.0071 | 516 | 0.1986 | 0.9221 | 0.0760 | 0.3442 | reported |
+| 2 | xgboost | SIC-2 | 28 | 4357 | 31 | 0.0071 | 516 | 0.1991 | 0.9290 | 0.0707 | 0.3441 | reported |
 | 2 | xgboost | SIC-2 | 29 | 175 | 2 | 0.0114 | 16 |  |  |  |  | too few (2 test positives, need 20) |
 | 2 | xgboost | SIC-2 | 30 | 229 | 0 | 0.0000 | 23 |  |  |  |  | too few (0 test positives, need 20) |
 | 2 | xgboost | SIC-2 | 31 | 108 | 0 | 0.0000 | 9 |  |  |  |  | too few (0 test positives, need 20) |
@@ -356,7 +356,7 @@
 | 2 | xgboost | SIC-2 | 59 | 703 | 7 | 0.0100 | 80 |  |  |  |  | too few (7 test positives, need 20) |
 | 2 | xgboost | SIC-2 | 70 | 247 | 0 | 0.0000 | 23 |  |  |  |  | too few (0 test positives, need 20) |
 | 2 | xgboost | SIC-2 | 72 | 144 | 0 | 0.0000 | 17 |  |  |  |  | too few (0 test positives, need 20) |
-| 2 | xgboost | SIC-2 | 73 | 4669 | 22 | 0.0047 | 544 | 0.0950 | 0.8651 | 0.0146 | 0.2950 | reported |
+| 2 | xgboost | SIC-2 | 73 | 4669 | 22 | 0.0047 | 544 | 0.1300 | 0.8614 | 0.0135 | 0.3376 | reported |
 | 2 | xgboost | SIC-2 | 75 | 84 | 1 | 0.0119 | 10 |  |  |  |  | too few (1 test positives, need 20) |
 | 2 | xgboost | SIC-2 | 76 | 12 | 0 | 0.0000 | 1 |  |  |  |  | too few (0 test positives, need 20) |
 | 2 | xgboost | SIC-2 | 78 | 100 | 0 | 0.0000 | 14 |  |  |  |  | too few (0 test positives, need 20) |
@@ -568,7 +568,7 @@
 | 3 | xgboost | SIC-2 | 25 | 199 | 0 | 0.0000 | 18 |  |  |  |  | too few (0 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 26 | 216 | 0 | 0.0000 | 20 |  |  |  |  | too few (0 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 27 | 128 | 0 | 0.0000 | 11 |  |  |  |  | too few (0 test positives, need 20) |
-| 3 | xgboost | SIC-2 | 28 | 4357 | 50 | 0.0115 | 516 | 0.2686 | 0.9322 | 0.1266 | 0.4394 | reported |
+| 3 | xgboost | SIC-2 | 28 | 4357 | 50 | 0.0115 | 516 | 0.2244 | 0.9265 | 0.0911 | 0.3828 | reported |
 | 3 | xgboost | SIC-2 | 29 | 175 | 3 | 0.0171 | 16 |  |  |  |  | too few (3 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 30 | 229 | 0 | 0.0000 | 23 |  |  |  |  | too few (0 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 31 | 108 | 0 | 0.0000 | 9 |  |  |  |  | too few (0 test positives, need 20) |
@@ -578,7 +578,7 @@
 | 3 | xgboost | SIC-2 | 35 | 1738 | 10 | 0.0058 | 163 |  |  |  |  | too few (10 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 36 | 2600 | 19 | 0.0073 | 256 |  |  |  |  | too few (19 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 37 | 1050 | 14 | 0.0133 | 112 |  |  |  |  | too few (14 test positives, need 20) |
-| 3 | xgboost | SIC-2 | 38 | 2963 | 27 | 0.0091 | 302 | 0.0926 | 0.8961 | 0.0298 | 0.2886 | reported |
+| 3 | xgboost | SIC-2 | 38 | 2963 | 27 | 0.0091 | 302 | 0.0833 | 0.8967 | 0.0297 | 0.2292 | reported |
 | 3 | xgboost | SIC-2 | 39 | 340 | 4 | 0.0118 | 33 |  |  |  |  | too few (4 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 40 | 30 | 0 | 0.0000 | 3 |  |  |  |  | too few (0 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 42 | 161 | 3 | 0.0186 | 16 |  |  |  |  | too few (3 test positives, need 20) |
@@ -600,7 +600,7 @@
 | 3 | xgboost | SIC-2 | 59 | 703 | 13 | 0.0185 | 80 |  |  |  |  | too few (13 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 70 | 247 | 0 | 0.0000 | 23 |  |  |  |  | too few (0 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 72 | 144 | 0 | 0.0000 | 17 |  |  |  |  | too few (0 test positives, need 20) |
-| 3 | xgboost | SIC-2 | 73 | 4669 | 34 | 0.0073 | 544 | 0.1241 | 0.9097 | 0.0367 | 0.3006 | reported |
+| 3 | xgboost | SIC-2 | 73 | 4669 | 34 | 0.0073 | 544 | 0.1720 | 0.9003 | 0.0359 | 0.3794 | reported |
 | 3 | xgboost | SIC-2 | 75 | 84 | 2 | 0.0238 | 10 |  |  |  |  | too few (2 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 76 | 12 | 0 | 0.0000 | 1 |  |  |  |  | too few (0 test positives, need 20) |
 | 3 | xgboost | SIC-2 | 78 | 100 | 0 | 0.0000 | 14 |  |  |  |  | too few (0 test positives, need 20) |
@@ -812,7 +812,7 @@
 | 4 | xgboost | SIC-2 | 25 | 199 | 0 | 0.0000 | 18 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 26 | 216 | 0 | 0.0000 | 20 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 27 | 128 | 0 | 0.0000 | 11 |  |  |  |  | too few (0 test positives, need 20) |
-| 4 | xgboost | SIC-2 | 28 | 4357 | 69 | 0.0158 | 516 | 0.2112 | 0.8835 | 0.0843 | 0.3769 | reported |
+| 4 | xgboost | SIC-2 | 28 | 4357 | 69 | 0.0158 | 516 | 0.2156 | 0.8995 | 0.0913 | 0.3809 | reported |
 | 4 | xgboost | SIC-2 | 29 | 175 | 4 | 0.0229 | 16 |  |  |  |  | too few (4 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 30 | 229 | 1 | 0.0044 | 23 |  |  |  |  | too few (1 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 31 | 108 | 0 | 0.0000 | 9 |  |  |  |  | too few (0 test positives, need 20) |
@@ -820,9 +820,9 @@
 | 4 | xgboost | SIC-2 | 33 | 384 | 0 | 0.0000 | 33 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 34 | 609 | 4 | 0.0066 | 55 |  |  |  |  | too few (4 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 35 | 1738 | 13 | 0.0075 | 163 |  |  |  |  | too few (13 test positives, need 20) |
-| 4 | xgboost | SIC-2 | 36 | 2600 | 29 | 0.0112 | 256 | 0.0949 | 0.8908 | 0.0340 | 0.2233 | reported |
+| 4 | xgboost | SIC-2 | 36 | 2600 | 29 | 0.0112 | 256 | 0.1130 | 0.8900 | 0.0343 | 0.2401 | reported |
 | 4 | xgboost | SIC-2 | 37 | 1050 | 19 | 0.0181 | 112 |  |  |  |  | too few (19 test positives, need 20) |
-| 4 | xgboost | SIC-2 | 38 | 2963 | 38 | 0.0128 | 302 | 0.1154 | 0.8945 | 0.0450 | 0.2848 | reported |
+| 4 | xgboost | SIC-2 | 38 | 2963 | 38 | 0.0128 | 302 | 0.1039 | 0.8999 | 0.0398 | 0.2607 | reported |
 | 4 | xgboost | SIC-2 | 39 | 340 | 6 | 0.0176 | 33 |  |  |  |  | too few (6 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 40 | 30 | 0 | 0.0000 | 3 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 42 | 161 | 4 | 0.0248 | 16 |  |  |  |  | too few (4 test positives, need 20) |
@@ -844,12 +844,12 @@
 | 4 | xgboost | SIC-2 | 59 | 703 | 18 | 0.0256 | 80 |  |  |  |  | too few (18 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 70 | 247 | 0 | 0.0000 | 23 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 72 | 144 | 0 | 0.0000 | 17 |  |  |  |  | too few (0 test positives, need 20) |
-| 4 | xgboost | SIC-2 | 73 | 4669 | 46 | 0.0099 | 544 | 0.1283 | 0.9105 | 0.0358 | 0.2690 | reported |
+| 4 | xgboost | SIC-2 | 73 | 4669 | 46 | 0.0099 | 544 | 0.1291 | 0.9096 | 0.0388 | 0.2686 | reported |
 | 4 | xgboost | SIC-2 | 75 | 84 | 3 | 0.0357 | 10 |  |  |  |  | too few (3 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 76 | 12 | 0 | 0.0000 | 1 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 78 | 100 | 0 | 0.0000 | 14 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 79 | 340 | 0 | 0.0000 | 39 |  |  |  |  | too few (0 test positives, need 20) |
-| 4 | xgboost | SIC-2 | 80 | 791 | 24 | 0.0303 | 86 | 0.3820 | 0.8997 | 0.1274 | 0.7585 | reported |
+| 4 | xgboost | SIC-2 | 80 | 791 | 24 | 0.0303 | 86 | 0.4126 | 0.9070 | 0.1638 | 0.7753 | reported |
 | 4 | xgboost | SIC-2 | 82 | 133 | 0 | 0.0000 | 17 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 83 | 12 | 0 | 0.0000 | 1 |  |  |  |  | too few (0 test positives, need 20) |
 | 4 | xgboost | SIC-2 | 87 | 582 | 0 | 0.0000 | 66 |  |  |  |  | too few (0 test positives, need 20) |

@@ -427,6 +427,29 @@ def capture_curve(y: np.ndarray, p: np.ndarray, n_points: int = 100):
     return pd.DataFrame({"frac_flagged": frac[take], "frac_captured": cum[take]})
 
 
+def platt_scale(y_val: np.ndarray, p_val: np.ndarray, p_test: np.ndarray) -> np.ndarray:
+    """Turn a score into probabilities with a logistic fitted on validation.
+
+    Platt scaling: one logistic regression on the single score variable, fitted
+    on validation and applied once to test.  It is monotone, so it cannot change
+    ROC-AUC, PR-AUC or any ranking; all it does is put an unbounded score on a
+    probability axis so that "predicted 3%, 3% failed" becomes a statement that
+    can be true or false.  Nothing is fitted on test.
+    """
+    from sklearn.linear_model import LogisticRegression
+
+    y_val = np.asarray(y_val).astype(int)
+    xv = np.asarray(p_val, dtype=float).reshape(-1, 1)
+    xt = np.asarray(p_test, dtype=float).reshape(-1, 1)
+    if len(np.unique(y_val)) < 2:
+        return logistic_scale(np.asarray(p_test, dtype=float))
+    sd = xv.std() or 1.0
+    mu = xv.mean()
+    lr = LogisticRegression(max_iter=1000)
+    lr.fit((xv - mu) / sd, y_val)
+    return lr.predict_proba((xt - mu) / sd)[:, 1]
+
+
 def logistic_scale(p: np.ndarray) -> np.ndarray:
     """Squash an unbounded score into (0, 1) so it can be asked about calibration.
 
