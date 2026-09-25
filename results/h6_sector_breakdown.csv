@@ -323,7 +323,7 @@ horizon,model,group_kind,group,n,n_positive,base_rate,n_firms,pr_auc,roc_auc,pr_
 2,xgboost,SIC-2,25,199,0,0.0,18,,,,,"too few (0 test positives, need 20)"
 2,xgboost,SIC-2,26,216,0,0.0,20,,,,,"too few (0 test positives, need 20)"
 2,xgboost,SIC-2,27,128,0,0.0,11,,,,,"too few (0 test positives, need 20)"
-2,xgboost,SIC-2,28,4357,31,0.0071149873766353,516,0.19861641785651082,0.9221436773895277,0.07602433834361987,0.34415745064948794,reported
+2,xgboost,SIC-2,28,4357,31,0.0071149873766353,516,0.19913676253608456,0.9290486629979271,0.0707495246609576,0.3441317401220843,reported
 2,xgboost,SIC-2,29,175,2,0.011428571428571429,16,,,,,"too few (2 test positives, need 20)"
 2,xgboost,SIC-2,30,229,0,0.0,23,,,,,"too few (0 test positives, need 20)"
 2,xgboost,SIC-2,31,108,0,0.0,9,,,,,"too few (0 test positives, need 20)"
@@ -355,7 +355,7 @@ horizon,model,group_kind,group,n,n_positive,base_rate,n_firms,pr_auc,roc_auc,pr_
 2,xgboost,SIC-2,59,703,7,0.00995732574679943,80,,,,,"too few (7 test positives, need 20)"
 2,xgboost,SIC-2,70,247,0,0.0,23,,,,,"too few (0 test positives, need 20)"
 2,xgboost,SIC-2,72,144,0,0.0,17,,,,,"too few (0 test positives, need 20)"
-2,xgboost,SIC-2,73,4669,22,0.004711929749411009,544,0.09500598745624708,0.865093804409492,0.014583398841146988,0.2949812925008363,reported
+2,xgboost,SIC-2,73,4669,22,0.004711929749411009,544,0.13004184213960512,0.8613670598822311,0.013469814497386665,0.33763293215967033,reported
 2,xgboost,SIC-2,75,84,1,0.011904761904761904,10,,,,,"too few (1 test positives, need 20)"
 2,xgboost,SIC-2,76,12,0,0.0,1,,,,,"too few (0 test positives, need 20)"
 2,xgboost,SIC-2,78,100,0,0.0,14,,,,,"too few (0 test positives, need 20)"
@@ -567,7 +567,7 @@ horizon,model,group_kind,group,n,n_positive,base_rate,n_firms,pr_auc,roc_auc,pr_
 3,xgboost,SIC-2,25,199,0,0.0,18,,,,,"too few (0 test positives, need 20)"
 3,xgboost,SIC-2,26,216,0,0.0,20,,,,,"too few (0 test positives, need 20)"
 3,xgboost,SIC-2,27,128,0,0.0,11,,,,,"too few (0 test positives, need 20)"
-3,xgboost,SIC-2,28,4357,50,0.011475786091347258,516,0.2685646318194738,0.932212677037381,0.12661119462821532,0.4394402898877292,reported
+3,xgboost,SIC-2,28,4357,50,0.011475786091347258,516,0.22442782357776583,0.9265056884142094,0.09107645407604274,0.38277655504995406,reported
 3,xgboost,SIC-2,29,175,3,0.017142857142857144,16,,,,,"too few (3 test positives, need 20)"
 3,xgboost,SIC-2,30,229,0,0.0,23,,,,,"too few (0 test positives, need 20)"
 3,xgboost,SIC-2,31,108,0,0.0,9,,,,,"too few (0 test positives, need 20)"
@@ -577,7 +577,7 @@ horizon,model,group_kind,group,n,n_positive,base_rate,n_firms,pr_auc,roc_auc,pr_
 3,xgboost,SIC-2,35,1738,10,0.005753739930955121,163,,,,,"too few (10 test positives, need 20)"
 3,xgboost,SIC-2,36,2600,19,0.007307692307692308,256,,,,,"too few (19 test positives, need 20)"
 3,xgboost,SIC-2,37,1050,14,0.013333333333333334,112,,,,,"too few (14 test positives, need 20)"
-3,xgboost,SIC-2,38,2963,27,0.00911238609517381,302,0.09257096670280686,0.8961045514179029,0.02976495923629692,0.288551432090692,reported
+3,xgboost,SIC-2,38,2963,27,0.00911238609517381,302,0.08334213244790224,0.8967352911494599,0.029723383703278726,0.22919857405235336,reported
 3,xgboost,SIC-2,39,340,4,0.011764705882352941,33,,,,,"too few (4 test positives, need 20)"
 3,xgboost,SIC-2,40,30,0,0.0,3,,,,,"too few (0 test positives, need 20)"
 3,xgboost,SIC-2,42,161,3,0.018633540372670808,16,,,,,"too few (3 test positives, need 20)"
@@ -599,7 +599,7 @@ horizon,model,group_kind,group,n,n_positive,base_rate,n_firms,pr_auc,roc_auc,pr_
 3,xgboost,SIC-2,59,703,13,0.01849217638691323,80,,,,,"too few (13 test positives, need 20)"
 3,xgboost,SIC-2,70,247,0,0.0,23,,,,,"too few (0 test positives, need 20)"
 3,xgboost,SIC-2,72,144,0,0.0,17,,,,,"too few (0 test positives, need 20)"
-3,xgboost,SIC-2,73,4669,34,0.007282073249089741,544,0.12409167695311456,0.9097468113458975,0.03673196348572594,0.3005799600553328,reported
+3,xgboost,SIC-2,73,4669,34,0.007282073249089741,544,0.17198898724770542,0.9002918966939527,0.03585542215772903,0.3794237534807801,reported
 3,xgboost,SIC-2,75,84,2,0.023809523809523808,10,,,,,"too few (2 test positives, need 20)"
 3,xgboost,SIC-2,76,12,0,0.0,1,,,,,"too few (0 test positives, need 20)"
 3,xgboost,SIC-2,78,100,0,0.0,14,,,,,"too few (0 test positives, need 20)"
@@ -811,7 +811,7 @@ horizon,model,group_kind,group,n,n_positive,base_rate,n_firms,pr_auc,roc_auc,pr_
 4,xgboost,SIC-2,25,199,0,0.0,18,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,26,216,0,0.0,20,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,27,128,0,0.0,11,,,,,"too few (0 test positives, need 20)"
-4,xgboost,SIC-2,28,4357,69,0.015836584806059217,516,0.21121446513033285,0.8835408555050833,0.08431457744384299,0.3768584824637263,reported
+4,xgboost,SIC-2,28,4357,69,0.015836584806059217,516,0.2156433567401583,0.8994599015790612,0.091287624092177,0.38094131361626277,reported
 4,xgboost,SIC-2,29,175,4,0.022857142857142857,16,,,,,"too few (4 test positives, need 20)"
 4,xgboost,SIC-2,30,229,1,0.004366812227074236,23,,,,,"too few (1 test positives, need 20)"
 4,xgboost,SIC-2,31,108,0,0.0,9,,,,,"too few (0 test positives, need 20)"
@@ -819,9 +819,9 @@ horizon,model,group_kind,group,n,n_positive,base_rate,n_firms,pr_auc,roc_auc,pr_
 4,xgboost,SIC-2,33,384,0,0.0,33,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,34,609,4,0.006568144499178982,55,,,,,"too few (4 test positives, need 20)"
 4,xgboost,SIC-2,35,1738,13,0.007479861910241657,163,,,,,"too few (13 test positives, need 20)"
-4,xgboost,SIC-2,36,2600,29,0.011153846153846153,256,0.09492362439317095,0.8908113037996754,0.034041333854580164,0.22326485268179136,reported
+4,xgboost,SIC-2,36,2600,29,0.011153846153846153,256,0.1130021459642694,0.8899529231883475,0.034291638568861096,0.24010332860738617,reported
 4,xgboost,SIC-2,37,1050,19,0.018095238095238095,112,,,,,"too few (19 test positives, need 20)"
-4,xgboost,SIC-2,38,2963,38,0.01282483968950388,302,0.11539866480835742,0.8945479082321186,0.045017326497281934,0.28479302613293134,reported
+4,xgboost,SIC-2,38,2963,38,0.01282483968950388,302,0.1039203397503252,0.8999370220422852,0.039827852879773654,0.2606702470694509,reported
 4,xgboost,SIC-2,39,340,6,0.01764705882352941,33,,,,,"too few (6 test positives, need 20)"
 4,xgboost,SIC-2,40,30,0,0.0,3,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,42,161,4,0.024844720496894408,16,,,,,"too few (4 test positives, need 20)"
@@ -843,12 +843,12 @@ horizon,model,group_kind,group,n,n_positive,base_rate,n_firms,pr_auc,roc_auc,pr_
 4,xgboost,SIC-2,59,703,18,0.025604551920341393,80,,,,,"too few (18 test positives, need 20)"
 4,xgboost,SIC-2,70,247,0,0.0,23,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,72,144,0,0.0,17,,,,,"too few (0 test positives, need 20)"
-4,xgboost,SIC-2,73,4669,46,0.009852216748768473,544,0.12833215814226243,0.9104524635800204,0.03582772493639165,0.26903915712561316,reported
+4,xgboost,SIC-2,73,4669,46,0.009852216748768473,544,0.1290776022544889,0.9095684150137779,0.03879145307049432,0.2686421923118473,reported
 4,xgboost,SIC-2,75,84,3,0.03571428571428571,10,,,,,"too few (3 test positives, need 20)"
 4,xgboost,SIC-2,76,12,0,0.0,1,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,78,100,0,0.0,14,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,79,340,0,0.0,39,,,,,"too few (0 test positives, need 20)"
-4,xgboost,SIC-2,80,791,24,0.03034134007585335,86,0.3819663068035915,0.8996631899174272,0.1274421392932451,0.7584850337743844,reported
+4,xgboost,SIC-2,80,791,24,0.03034134007585335,86,0.4126092204390787,0.9069969578444155,0.16384859577445213,0.7752618158839596,reported
 4,xgboost,SIC-2,82,133,0,0.0,17,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,83,12,0,0.0,1,,,,,"too few (0 test positives, need 20)"
 4,xgboost,SIC-2,87,582,0,0.0,66,,,,,"too few (0 test positives, need 20)"

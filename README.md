@@ -234,74 +234,90 @@ fewer windows each. Two consequences:
 
 ## 9. What the run found
 
-Headline numbers from the artefacts in `results/`. Every one is traceable to a
-CSV and a seed; see `reports/RESULTS.md` for the full tables.
+<!-- FINDINGS:START -->
+_Generated from the CSVs in `results/` by `src/report.py`; do not edit by hand._
 
-**A tuned XGBoost on the flattened window has the highest PR-AUC of any model
-here** — 0.149 at h=4, against the best neural model's 0.069. Gradient boosting
-on 232 flattened ratio-quarters beats all four temporal architectures by roughly
-2×, on the same row set, the same split and the same 30-trial tuning budget.
-That is the headline, and it is why the paper is framed around the decomposition
-rather than around sequence models winning.
+**xgboost on the flattened window has the highest PR-AUC of any model here** — 0.1510 at h=4, against the best neural model's (transformer) 0.0729, and Altman Z″'s 0.0305. Same row set, same split, same 30-trial tuning budget, and both are five-seed ensembles.
 
-**Among the temporal architectures the Transformer is best**, and the only one
-that does not decay as the horizon lengthens: test PR-AUC at h=4 is Transformer
-0.069 ± 0.012, CNN-LSTM-Attn 0.044 ± 0.006, LSTM 0.039 ± 0.009, Bi-LSTM
-0.035 ± 0.007, against Altman Z″'s 0.031. Across h=1…4 the Transformer stays in
-0.069–0.079 while the others fall away. Phase H reports firm-clustered intervals
-on every one of those comparisons, so the ordering can be read with its
-uncertainty rather than as a ranking.
+Temporal architectures at h=4:
 
-Numbers quoted here are the **per-seed mean ± std**. Every table also carries
-the **seed-ensemble** value (the metric of the averaged prediction), which is
-the higher of the two and is what the significance tests use. Both conventions
-are named in every column; see `docs/DECISIONS.md` 4.x.
+| model | PR-AUC (ensemble) | PR-AUC (per-seed mean +/- std) | ROC-AUC (ensemble) |
+|---|---|---|---|
+| transformer | 0.0729 | 0.0692 ± 0.0122 | 0.8510 |
+| cnn_lstm_attn | 0.0599 | 0.0440 ± 0.0060 | 0.8159 |
+| lstm | 0.0466 | 0.0390 ± 0.0093 | 0.7684 |
+| bilstm | 0.0461 | 0.0353 ± 0.0067 | 0.7566 |
 
-**The decomposition answers its question, and the answer is not the expected
-one.** At h=4, of the total movement from Altman Z″ to a full temporal model,
-**1% is coefficient drift** (+0.0010 PR-AUC, 95% CI [−0.0021, +0.0047] — not
-distinguishable from zero), **54% is the static formulation** (+0.0915, CI
-[+0.0657, +0.1254]) and **45% is the feature-set expansion moving the wrong way**
-(−0.0764, CI [−0.1088, −0.0504]). Re-estimating Altman's sixty-year-old
-coefficients on modern data buys nothing measurable; giving the same five ratios
-a time axis is what helps; and widening five ratios to twenty-nine *hurts* the
-LSTM significantly. The Transformer recovers part of that loss, so the last step
-is partly an LSTM capacity limit rather than a clean statement about features.
-The gaps survive retraining on the subset where all five Altman ratios are
-observed in all eight quarters, so they are not a missingness artefact.
 
-**The protocol audit reproduces the inflated accuracies and locates them.** The
-same LSTM, three ways at h=1: PR-AUC **0.9998** under the inflated protocol
-(random split, SMOTE before splitting), 0.9511 half-fixed, **0.0217** under the
-correct one — a **46× collapse**, 95% of it attributable to resampling before
-the split rather than to the random split itself. The diagnostic that makes the
-point concrete: the correctly-evaluated model reports **99.74% accuracy and
-loses to a constant that predicts no bankruptcy at all** (99.81%), while its
-PR-AUC is 11.6× the base rate. The same audit on UCI Polish gives PR-AUC 0.999
-inflated against 0.494 correct, and on UCI Taiwanese 0.998 against 0.319.
+**Does the eight-quarter window help the best model?** Not measurably. The window minus t-0 difference for xgboost is +0.0078 to +0.0553 PR-AUC across the four horizons, and the firm-clustered interval contains zero at 4 of 4 horizons.
 
-**No training-side imbalance treatment beats a well-chosen threshold.** At h=4
-the Transformer's best expected cost at a 50:1 miss-to-false-alarm ratio comes
-from cost-sensitive thresholding on the *untreated* model (0.197, recall 0.304),
-not from class weights (0.217), SMOTE (0.222) or focal loss (0.221). SMOTE and
-focal loss both reduce the Transformer's PR-AUC (0.041 and 0.047 against 0.066
-untreated).
+| horizon | t0_pr_auc | window_pr_auc | window_minus_t0_pr_auc | pr_auc_cluster_ci_low | pr_auc_cluster_ci_high | pr_auc_cluster_p | window_helps |
+|---|---|---|---|---|---|---|---|
+| 1 | 0.1042 | 0.1595 | 0.0553 | -0.0253 | 0.1332 | 0.1670 | False |
+| 2 | 0.0938 | 0.1250 | 0.0312 | -0.0048 | 0.0675 | 0.1030 | False |
+| 3 | 0.1323 | 0.1401 | 0.0078 | -0.0276 | 0.0401 | 0.7490 | False |
+| 4 | 0.1151 | 0.1510 | 0.0359 | -0.0024 | 0.0750 | 0.0690 | False |
 
-**Altman at its published cutoffs alarms on 44% of windows** at a ~1% base rate:
-recall 0.93, precision 0.024. Threshold-free it is a reasonable ranker
-(ROC-AUC 0.81–0.85); as a decision rule it is unusable at this base rate.
 
-**Interpretability agrees on the recent quarters and disagrees on which one.**
-Both methods put the most weight on the final quarters; the Transformer's
-attention and SHAP agree that t-0 matters most (Spearman ρ = 0.40, not
-significant over 8 points), while the CNN-LSTM-Attention weights correlate
-strongly with SHAP (ρ = 0.93, p = 0.0009) but peak at t-1 rather than t-0. The
-disagreement is reported rather than resolved. Three of Altman's five ratios sit
-in the bottom third of the SHAP ranking.
+**Why?** Four of the 29 ratios are year-on-year growth, so a single t-0 row already carries a four-quarter comparison. Dropping r21–r24 and repeating the comparison supports that reading at 3 of 4 horizons.
 
-**The 2020–2021 COVID fold is not an outlier for the deep model** — rolling-origin
-PR-AUC is 0.087, 0.111, 0.107, 0.102 across the four expanding folds — but it is
-for Altman Z″, which drops to 0.013 from ~0.030 elsewhere.
+| horizon | window_gap_with_growth | window_gap_without_growth | growth_worth_to_t0 | growth_worth_to_window | supports_explanation |
+|---|---|---|---|---|---|
+| 1 | 0.0553 | 0.0448 | -0.0009 | 0.0096 | False |
+| 2 | 0.0312 | 0.0707 | 0.0166 | -0.0229 | True |
+| 3 | 0.0078 | 0.0443 | 0.0448 | 0.0083 | True |
+| 4 | 0.0359 | 0.0437 | 0.0226 | 0.0149 | True |
+
+
+**The decomposition.** At h=4, of the 0.1689 of total movement from Altman Z″ to the full temporal model: 1% A_zdp->B_levels (+0.0010), 2% B_levels->B_tensor (+0.0028), 24% B_tensor->B_mlp_t0 (+0.0399), 29% B_mlp_t0->C_lstm (+0.0488), 45% C_lstm->D_lstm (-0.0764).
+
+Each step with its firm-clustered interval:
+
+| step | cause | PR-AUC change | 95% CI | excludes 0 |
+|---|---|---|---|---|
+| A_zdp -> B_levels | coefficient drift | 0.0010 | [-0.0044, +0.0080] | False |
+| B_levels -> B_tensor | preprocessing (annualised levels to z-scored quarterly ratios) | 0.0028 | [-0.0009, +0.0083] | False |
+| B_tensor -> B_mlp_t0 | nonlinearity | 0.0399 | [+0.0204, +0.0665] | True |
+| B_mlp_t0 -> C_lstm | the time axis | 0.0488 | [+0.0194, +0.0829] | True |
+| C_lstm -> D_lstm | the feature-set expansion | -0.0764 | [-0.1165, -0.0412] | True |
+| D_lstm -> D_transformer | architecture | 0.0264 | [+0.0039, +0.0559] | True |
+
+
+**The protocol audit.** The same LSTM at h=1, scored at matched base rates: PR-AUC 0.8939 under the inflated protocol against 0.0217 under the correct one — a 41x collapse, with both scored on real windows at a 0.0019 base rate. On ROC-AUC, which is base-rate invariant, 74% of the loss is the resampling order and 26% the split.
+
+The same model reports 0.9974 accuracy and loses to a constant predicting no bankruptcy (0.9981).
+
+**What a practitioner gets.** Of the 50 riskiest firms at h=4:
+
+| model | tp | n_positive | precision | recall | lift |
+|---|---|---|---|---|---|
+| altman_zdp | 1 | 123 | 0.0200 | 0.0081 | 0.5514 |
+| xgboost | 17 | 123 | 0.3400 | 0.1382 | 9.3735 |
+| transformer | 12 | 123 | 0.2400 | 0.0976 | 6.6166 |
+| C_lstm | 18 | 123 | 0.3600 | 0.1463 | 9.9249 |
+
+
+**Calibration** (scores are Platt-scaled on validation where they are not already probabilities):
+
+| model | scaling | base_rate | mean_predicted | brier | ece |
+|---|---|---|---|---|---|
+| altman_zdp | Platt-scaled on validation | 0.01127 | 0.00522 | 0.01118 | 0.01033 |
+| xgboost | native probability | 0.01127 | 0.00908 | 0.01136 | 0.00541 |
+| transformer | native probability | 0.01127 | 0.04445 | 0.01878 | 0.03318 |
+| C_lstm | native probability | 0.01127 | 0.07732 | 0.03196 | 0.06605 |
+
+
+**Who it works for.** PR-AUC at h=4 by total-assets tercile (cut on the train period):
+
+| model | small | mid | large |
+|---|---|---|---|
+| C_lstm | 0.0689 | 0.1803 | 0.2423 |
+| altman_zdp | 0.0265 | 0.0709 | 0.0595 |
+| transformer | 0.0427 | 0.1012 | 0.1229 |
+| xgboost | 0.0618 | 0.1984 | 0.3194 |
+
+
+<!-- FINDINGS:END -->
 
 ---
 

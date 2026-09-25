@@ -47,7 +47,13 @@ CAUSE = {
 # Every rung below B_mlp_t0 is a single deterministic fit; every rung from
 # B_mlp_t0 up is the mean of five seeds' predicted probabilities.  Stated in the
 # table so the aggregation convention is never implicit.
-ENSEMBLE_RUNGS = {"B_mlp_t0", "C_lstm", "D_lstm", "D_transformer"}
+ENSEMBLE_RUNGS = {"B_mlp_t0", "C_lstm", "D_lstm", "D_transformer",
+                  "B_xgb_t0", "C_xgb"}
+
+# A refit two years closer to the test window has to recover at least this much
+# of the ROC-AUC drop, with a firm-clustered interval clear of zero, before the
+# drop is called distribution shift.  Without a floor the flag fires on noise.
+MIN_RECOVERY_SHARE = 0.10
 
 
 # --------------------------------------------------------------------------
@@ -143,27 +149,47 @@ def nonlinearity_rung(splits, horizons=C.HORIZONS, seeds=C.SEEDS,
     return records
 
 
-def tree_rungs(splits, horizons=C.HORIZONS, n_trials: int = C.TUNING_TRIALS,
-               force: bool = False) -> pd.DataFrame:
+def tree_rungs(splits, horizons=C.HORIZONS, seeds=C.SEEDS,
+               n_trials: int = C.TUNING_TRIALS,
+               force: bool = False) -> tuple[pd.DataFrame, pd.DataFrame]:
     """The same ladder walked by gradient boosting instead of a neural net.
 
     If the time axis is what pays, it should pay for a tree as well: B_xgb_t0
     (five ratios at t-0) against C_xgb (the same five across eight quarters)
-    isolates it without any neural network in the comparison.
+    isolates it without any neural network in the comparison.  Both are five-seed
+    ensembles and the difference carries a firm-clustered interval, because this
+    is the cleanest evidence in the study and a single fit with no interval
+    would not carry it.
     """
     from . import tabular as TAB
 
-    rows = []
+    rows, tests = [], []
     for h in horizons:
         rows.append(TAB.run_tabular(
             "decompB_xgb_t0", h, splits, model="xgboost", feature_cols=C.ALTMAN_IDX,
-            t0_only=True, n_trials=n_trials, force=force,
+            t0_only=True, seeds=seeds, n_trials=n_trials, force=force,
             note="Altman's five ratios at t-0 only"))
         rows.append(TAB.run_tabular(
             "decompC_xgb", h, splits, model="xgboost", feature_cols=C.ALTMAN_IDX,
-            t0_only=False, n_trials=n_trials, force=force,
+            t0_only=False, seeds=seeds, n_trials=n_trials, force=force,
             note="Altman's five ratios across all eight quarters (40 inputs)"))
-    return pd.DataFrame(rows)
+
+        t0 = E.load_preds(f"decompB_xgb_t0_{h}", "test")
+        win = E.load_preds(f"decompC_xgb_{h}", "test")
+        y = win["y_true"].to_numpy().astype(int)
+        g = win["cik"].astype(str).to_numpy()
+        cmp = M.compare(y, t0["p_hat"].to_numpy(), win["p_hat"].to_numpy(), g,
+                        n_boot=2000)
+        tests.append({
+            "horizon": h, "comparison": "C_xgb (5 ratios x 8 quarters) - B_xgb_t0 (5 at t-0)",
+            "t0_pr_auc": M.pr_auc(y, t0["p_hat"].to_numpy()),
+            "window_pr_auc": M.pr_auc(y, win["p_hat"].to_numpy()),
+            "aggregation": f"both are {len(seeds)}-seed ensembles",
+            **cmp,
+            "window_helps_pr_auc": bool(cmp["pr_auc_cluster_ci_low"] > 0),
+            "window_helps_roc_auc": bool(cmp["roc_auc_cluster_ci_low"] > 0),
+        })
+    return pd.DataFrame(rows), pd.DataFrame(tests)
 
 
 def seed_mean_pred(key_fn, seeds, split: str, col: str = "p_hat") -> tuple[np.ndarray, np.ndarray, pd.DataFrame]:
@@ -390,7 +416,7 @@ def main(full: bool = True, horizons=C.HORIZONS, seeds=C.SEEDS,
 
     temporal_models(splits, horizons=horizons, seeds=seeds, force=force)
     nonlinearity_rung(splits, horizons=horizons, seeds=seeds, force=force)
-    trees = tree_rungs(splits, horizons=horizons, force=force)
+    trees, tree_tests = tree_rungs(splits, horizons=horizons, seeds=seeds, force=force)
 
     tables, primary, extended, shares, sig = [], {}, {}, [], []
     for h in horizons:
@@ -421,6 +447,7 @@ def main(full: bool = True, horizons=C.HORIZONS, seeds=C.SEEDS,
     U.write_table(pd.DataFrame(sig), C.RESULTS / "decomposition_significance")
     U.write_table(trees.drop(columns=["key"], errors="ignore"),
                   C.RESULTS / "decomposition_tree_ladder")
+    U.write_table(tree_tests, C.RESULTS / "decomposition_tree_ladder_tests")
 
     drift = coefficient_drift_diagnostic(j, horizons=horizons)
     U.write_table(drift, C.RESULTS / "decomposition_drift_diagnostic", floatfmt="%.5f")
@@ -429,7 +456,7 @@ def main(full: bool = True, horizons=C.HORIZONS, seeds=C.SEEDS,
     U.write_table(chk, C.RESULTS / "decomposition_complete_subset")
 
     write_summary(sh, chk, primary, extended, sig=pd.DataFrame(sig), drift=drift,
-                  trees=trees)
+                  trees=trees, tree_tests=tree_tests)
     return {"horizons": list(horizons)}
 
 
@@ -466,16 +493,44 @@ def coefficient_drift_diagnostic(j: pd.DataFrame, horizons=C.HORIZONS) -> pd.Dat
         out["published_pr_auc"] = M.pr_auc(y[is_te], a[is_te])
         out["roc_drop_train_only"] = out["train_only_roc_auc"] - out["published_roc_auc"]
         out["roc_drop_train_plus_val"] = out["train_plus_val_roc_auc"] - out["published_roc_auc"]
-        out["shift_explains_drop"] = bool(
-            out["roc_drop_train_plus_val"] > out["roc_drop_train_only"])
-        cb = M.cluster_bootstrap_diff(
-            y[is_te], a[is_te],
-            K.refit_altman(j[is_tr], y[is_tr], ["X1", "X2", "X3", "X4"])[0]
-            .predict_proba(Xall)[:, 1][is_te], groups, stat=M.roc_auc, n_boot=1000)
+
+        p_tr = K.refit_altman(j[is_tr], y[is_tr], ["X1", "X2", "X3", "X4"])[0] \
+            .predict_proba(Xall)[:, 1]
+        p_trval = K.refit_altman(j[is_trval], y[is_trval], ["X1", "X2", "X3", "X4"])[0] \
+            .predict_proba(Xall)[:, 1]
+
+        # Is the drop real?  (published vs the train-only refit)
+        cb = M.cluster_bootstrap_diff(y[is_te], a[is_te], p_tr[is_te], groups,
+                                      stat=M.roc_auc, n_boot=1000)
         out["roc_drop_cluster_ci_low"] = cb["ci_low"]
         out["roc_drop_cluster_ci_high"] = cb["ci_high"]
         out["roc_drop_cluster_excludes_zero"] = bool(
             np.isfinite(cb["ci_low"]) and (cb["ci_low"] > 0 or cb["ci_high"] < 0))
+
+        # Does moving the fit two years closer to test recover any of it?
+        # The flag below used to fire on the sign of a difference of two drops
+        # with no interval at all, so it read True on a 5e-5 change.  It now
+        # requires the recovery to be both materially large and distinguishable
+        # from zero under a firm-clustered interval.
+        rec = M.cluster_bootstrap_diff(y[is_te], p_tr[is_te], p_trval[is_te], groups,
+                                       stat=M.roc_auc, n_boot=1000)
+        recovery = rec["diff"]                     # roc(train+val) - roc(train only)
+        drop = abs(out["roc_drop_train_only"])
+        out["roc_recovery_from_refitting_on_train_plus_val"] = recovery
+        out["recovery_cluster_ci_low"] = rec["ci_low"]
+        out["recovery_cluster_ci_high"] = rec["ci_high"]
+        out["recovery_share_of_drop"] = recovery / drop if drop > 1e-9 else np.nan
+        out["recovery_excludes_zero"] = bool(
+            np.isfinite(rec["ci_low"]) and rec["ci_low"] > 0)
+        out["shift_explains_drop"] = bool(
+            out["recovery_excludes_zero"]
+            and np.isfinite(out["recovery_share_of_drop"])
+            and out["recovery_share_of_drop"] >= MIN_RECOVERY_SHARE)
+        out["shift_verdict"] = (
+            "shift explains part of the drop" if out["shift_explains_drop"]
+            else f"shift does not explain the drop (recovers "
+                 f"{out['recovery_share_of_drop'] * 100:.1f}% of it, "
+                 f"95% CI [{rec['ci_low']:+.5f}, {rec['ci_high']:+.5f}])")
         rows.append(out)
     return pd.DataFrame(rows)
 
@@ -485,7 +540,8 @@ def write_summary(shares: pd.DataFrame, chk: pd.DataFrame,
                   extended: dict[int, pd.DataFrame] | None = None,
                   sig: pd.DataFrame | None = None,
                   drift: pd.DataFrame | None = None,
-                  trees: pd.DataFrame | None = None) -> None:
+                  trees: pd.DataFrame | None = None,
+                  tree_tests: pd.DataFrame | None = None) -> None:
     L = [
         "# Decomposition summary", "",
         "Every model here scores the identical row set.  **A** applies Altman's published",
@@ -556,9 +612,14 @@ def write_summary(shares: pd.DataFrame, chk: pd.DataFrame,
               "diagnostic only; nothing fitted on val scores a headline number.", "",
               U.to_markdown(drift[["horizon", "published_roc_auc", "train_only_roc_auc",
                                    "train_plus_val_roc_auc", "roc_drop_train_only",
-                                   "roc_drop_train_plus_val", "shift_explains_drop",
-                                   "roc_drop_cluster_ci_low", "roc_drop_cluster_ci_high"]],
-                           floatfmt="%.5f"), ""]
+                                   "roc_drop_cluster_ci_low", "roc_drop_cluster_ci_high",
+                                   "roc_recovery_from_refitting_on_train_plus_val",
+                                   "recovery_cluster_ci_low", "recovery_cluster_ci_high",
+                                   "recovery_share_of_drop", "shift_explains_drop"]],
+                           floatfmt="%.5f"), "",
+              "Verdict per horizon:", ""]
+        L += [f"- h={int(r.horizon)}: {r.shift_verdict}" for r in drift.itertuples()]
+        L += [""]
 
     if trees is not None and len(trees):
         L += ["## The same question without a neural network", "",

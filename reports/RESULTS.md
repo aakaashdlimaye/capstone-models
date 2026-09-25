@@ -5,23 +5,72 @@ No number in this file is typed by hand.
 
 - Universe: **full**
 - Dataset repository SHA: `b16eb17`
-- Models repository SHA: `85c3df3`
+- Models repository SHA: `5a5a82c`
 - Seeds: `[0, 1, 2, 3, 4]`; deep results are mean ± std over 5 seeds unless stated otherwise.
-- Generated: 2026-09-25T05:49:37
-- Total measured compute: **14.61 h** over 315 cached deep runs plus the logged tuning trials.
+- Generated: 2026-09-25T21:01:31
+- Total measured compute: **14.90 h** over 315 cached deep runs plus the logged tuning trials.
 
 ## Changes from previous run
 
-Every watched number whose relative change exceeded 10%, old against new.  3,930 numbers watched, 840 newly added this run.
+Every watched number whose relative change exceeded 10%, old against new.  3,674 numbers watched, 240 newly added this run.
 
-**4 numbers moved.**
+**53 numbers moved.**
 
 | file | row | metric | old | new | rel_change |
 |---|---|---|---|---|---|
-| decomposition_all.csv | 4 / C_lstm | pr_auc_diff | 0.0886 | 0.0488 | 0.4499 |
-| decomposition_all.csv | 3 / C_lstm | pr_auc_diff | 0.1022 | 0.0633 | 0.3805 |
-| decomposition_all.csv | 2 / C_lstm | pr_auc_diff | 0.1097 | 0.0713 | 0.3498 |
-| decomposition_all.csv | 1 / C_lstm | pr_auc_diff | 0.0995 | 0.0749 | 0.2473 |
+| baselines_all.csv | svm_rbf / 3 | alarm_rate | 0.0142 | 0.0298 | 1.1007 |
+| baselines_all.csv | stacking / 1 | alarm_rate | 0.0012 | 0.0021 | 0.7692 |
+| baselines_all.csv | svm_rbf / 3 | cost_1to1 | 0.0190 | 0.0331 | 0.7447 |
+| baselines_all.csv | random_forest / 1 | alarm_rate | 0.0016 | 0.0026 | 0.6346 |
+| baselines_all.csv | random_forest / 4 | alarm_rate | 0.0056 | 0.0088 | 0.5659 |
+| baselines_all.csv | random_forest / 3 | alarm_rate | 0.0061 | 0.0094 | 0.5590 |
+| baselines_all.csv | stacking / 1 | recall | 0.1333 | 0.2000 | 0.5000 |
+| baselines_all.csv | random_forest / 4 | recall | 0.0937 | 0.1405 | 0.5000 |
+| baselines_all.csv | svm_rbf / 4 | alarm_rate | 0.0213 | 0.0108 | 0.4934 |
+| baselines_all.csv | svm_rbf / 3 | recall | 0.2038 | 0.2962 | 0.4528 |
+| baselines_all.csv | random_forest / 1 | recall | 0.1667 | 0.2333 | 0.4000 |
+| baselines_all.csv | svm_rbf / 2 | brier | 0.2074 | 0.1302 | 0.3719 |
+| baselines_all.csv | svm_rbf / 4 | recall | 0.1543 | 0.0992 | 0.3571 |
+| baselines_all.csv | svm_rbf / 1 | brier | 0.0540 | 0.0732 | 0.3556 |
+| baselines_all.csv | random_forest / 3 | recall | 0.1269 | 0.1692 | 0.3333 |
+| baselines_all.csv | svm_rbf / 4 | cost_1to1 | 0.0291 | 0.0198 | 0.3188 |
+| baselines_all.csv | svm_rbf / 3 | precision | 0.1160 | 0.0802 | 0.3084 |
+| baselines_all.csv | random_forest / 1 | cost_1to1 | 0.0029 | 0.0036 | 0.2717 |
+| baselines_all.csv | svm_rbf / 4 | precision | 0.0815 | 0.1034 | 0.2691 |
+| baselines_all.csv | stacking / 1 | cost_1to1 | 0.0026 | 0.0033 | 0.2651 |
+| baselines_all.csv | svm_rbf / 4 | brier | 0.0915 | 0.1156 | 0.2627 |
+| baselines_all.csv | random_forest / 4 | f1 | 0.1248 | 0.1574 | 0.2616 |
+| baselines_all.csv | svm_rbf / 2 | alarm_rate | 0.0315 | 0.0395 | 0.2532 |
+| baselines_all.csv | xgboost / 3 | alarm_rate | 0.0063 | 0.0079 | 0.2512 |
+| baselines_all.csv | svm_rbf / 2 | pr_auc | 0.0370 | 0.0463 | 0.2494 |
+| baselines_all.csv | svm_rbf / 2 | cost_1to1 | 0.0332 | 0.0408 | 0.2269 |
+| baselines_all.csv | random_forest / 3 | cost_1to1 | 0.0121 | 0.0148 | 0.2237 |
+| baselines_all.csv | svm_rbf / 4 | pr_auc | 0.0467 | 0.0558 | 0.1959 |
+| baselines_all.csv | xgboost / 4 | alarm_rate | 0.0047 | 0.0038 | 0.1867 |
+| baselines_all.csv | stacking / 2 | brier | 0.1390 | 0.1132 | 0.1853 |
+| baselines_all.csv | svm_rbf / 4 | val_pr_auc | 0.0393 | 0.0464 | 0.1821 |
+| baselines_all.csv | stacking / 3 | alarm_rate | 0.0057 | 0.0047 | 0.1730 |
+| baselines_all.csv | stacking / 2 | recall | 0.1139 | 0.1329 | 0.1667 |
+| baselines_all.csv | stacking / 1 | precision | 0.2051 | 0.1739 | 0.1522 |
+| baselines_all.csv | stacking / 1 | f1 | 0.1616 | 0.1860 | 0.1512 |
+| baselines_all.csv | svm_rbf / 3 | f1 | 0.1478 | 0.1262 | 0.1462 |
+| baselines_all.csv | random_forest / 3 | precision | 0.1692 | 0.1447 | 0.1447 |
+| baselines_all.csv | random_forest / 4 | cost_1to1 | 0.0148 | 0.0169 | 0.1447 |
+| baselines_all.csv | random_forest / 1 | precision | 0.1923 | 0.1647 | 0.1435 |
+| baselines_all.csv | stacking / 3 | recall | 0.1385 | 0.1192 | 0.1389 |
+| baselines_all.csv | svm_rbf / 2 | recall | 0.3228 | 0.3671 | 0.1373 |
+| baselines_all.csv | xgboost / 1 | pr_auc | 0.1406 | 0.1595 | 0.1340 |
+| baselines_all.csv | svm_rbf / 3 | pr_auc | 0.0609 | 0.0687 | 0.1289 |
+| baselines_all.csv | xgboost / 3 | precision | 0.2167 | 0.1890 | 0.1281 |
+| baselines_all.csv | xgboost / 1 | val_pr_auc | 0.2499 | 0.2186 | 0.1253 |
+| baselines_all.csv | stacking / 2 | alarm_rate | 0.0032 | 0.0036 | 0.1250 |
+| baselines_all.csv | svm_rbf / 3 | brier | 0.1820 | 0.1595 | 0.1239 |
+| baselines_all.csv | xgboost / 2 | alarm_rate | 0.0038 | 0.0043 | 0.1220 |
+| baselines_all.csv | xgboost / 3 | cost_1to1 | 0.0116 | 0.0130 | 0.1147 |
+| baselines_all.csv | random_forest / 2 | alarm_rate | 0.0046 | 0.0052 | 0.1141 |
+| baselines_all.csv | stacking / 2 | f1 | 0.1374 | 0.1527 | 0.1115 |
+| baselines_all.csv | xgboost / 4 | recall | 0.1019 | 0.0909 | 0.1081 |
+| baselines_all.csv | stacking / 1 | brier | 0.0871 | 0.0963 | 0.1047 |
 
 
 Read PR-AUC first.  At a window-level positive rate of roughly 1% (0.18% at
@@ -52,10 +101,10 @@ learning and deep — is scored on exactly these rows.
 | ohlson_o | formula | 0.8260 | 0.0052 | 0.8643 | 0.0077 | 0.0153 | 0.6500 | 0.8441 | 0.0077 | -2.3698 | 0.1563 | 0.1621 | 0.1686 | 0.1882 |
 | zmijewski | formula | 0.8424 | 0.0064 | 0.8744 | 0.0090 | 0.0198 | 0.8167 | 0.8496 | 0.0100 | 2.2860 | 0.1505 | 0.1536 | 0.1570 | 0.1672 |
 | logreg | ml | 0.9024 | 0.0249 | 0.7779 | 0.0241 | 0.0638 | 0.2333 | 0.9886 | 0.0369 | 0.9929 | 0.0128 | 0.0256 | 0.0399 | 0.0827 |
-| svm_rbf | ml | 0.9037 | 0.0214 | 0.8303 | 0.0173 | 0.0493 | 0.2833 | 0.9809 | 0.0270 | 0.9288 | 0.0204 | 0.0324 | 0.0457 | 0.0858 |
-| random_forest | ml | 0.9285 | 0.1574 | 0.8750 | 0.0984 | 0.1786 | 0.1667 | 0.9987 | 0.1923 | 0.3497 | 0.0029 | 0.0168 | 0.0323 | 0.0789 |
-| xgboost | ml | 0.9195 | 0.2499 | 0.8484 | 0.1406 | 0.1948 | 0.2500 | 0.9975 | 0.1596 | 0.0593 | 0.0038 | 0.0164 | 0.0304 | 0.0723 |
-| stacking | ml | 0.9373 | 0.1739 | 0.8940 | 0.1048 | 0.1616 | 0.1333 | 0.9990 | 0.2051 | 1.0000 | 0.0026 | 0.0171 | 0.0332 | 0.0817 |
+| svm_rbf | ml | 0.9068 | 0.0207 | 0.8137 | 0.0172 | 0.0486 | 0.3000 | 0.9794 | 0.0265 | 0.9686 | 0.0219 | 0.0336 | 0.0466 | 0.0857 |
+| random_forest | ml | 0.9381 | 0.1564 | 0.8948 | 0.0962 | 0.1931 | 0.2333 | 0.9978 | 0.1647 | 0.2900 | 0.0036 | 0.0165 | 0.0308 | 0.0736 |
+| xgboost | ml | 0.9293 | 0.2186 | 0.8683 | 0.1595 | 0.1911 | 0.2500 | 0.9974 | 0.1546 | 0.0583 | 0.0039 | 0.0165 | 0.0305 | 0.0724 |
+| stacking | ml | 0.9416 | 0.1734 | 0.8943 | 0.1086 | 0.1860 | 0.2000 | 0.9982 | 0.1739 | 0.9997 | 0.0033 | 0.0167 | 0.0316 | 0.0763 |
 
 
 ### Horizon h = 2
@@ -67,10 +116,10 @@ learning and deep — is scored on exactly these rows.
 | ohlson_o | formula | 0.8191 | 0.0095 | 0.8535 | 0.0172 | 0.0369 | 0.8291 | 0.7878 | 0.0189 | -3.6946 | 0.2120 | 0.2196 | 0.2280 | 0.2531 |
 | zmijewski | formula | 0.8309 | 0.0113 | 0.8631 | 0.0197 | 0.0460 | 0.7342 | 0.8512 | 0.0237 | 2.2860 | 0.1494 | 0.1611 | 0.1741 | 0.2132 |
 | logreg | ml | 0.8894 | 0.0321 | 0.8403 | 0.0383 | 0.0886 | 0.2089 | 0.9827 | 0.0562 | 0.9679 | 0.0211 | 0.0560 | 0.0948 | 0.2112 |
-| svm_rbf | ml | 0.8937 | 0.0330 | 0.8805 | 0.0370 | 0.0870 | 0.3228 | 0.9699 | 0.0502 | 0.9484 | 0.0332 | 0.0631 | 0.0963 | 0.1960 |
-| random_forest | ml | 0.9036 | 0.1716 | 0.8828 | 0.0977 | 0.1368 | 0.1329 | 0.9960 | 0.1409 | 0.2314 | 0.0082 | 0.0465 | 0.0890 | 0.2166 |
-| xgboost | ml | 0.9033 | 0.2980 | 0.9028 | 0.1157 | 0.1922 | 0.1709 | 0.9970 | 0.2195 | 0.1668 | 0.0070 | 0.0436 | 0.0843 | 0.2063 |
-| stacking | ml | 0.9234 | 0.2313 | 0.9002 | 0.1135 | 0.1374 | 0.1139 | 0.9973 | 0.1731 | 0.9999 | 0.0070 | 0.0461 | 0.0896 | 0.2200 |
+| svm_rbf | ml | 0.8954 | 0.0333 | 0.8854 | 0.0463 | 0.0811 | 0.3671 | 0.9621 | 0.0456 | 0.7970 | 0.0408 | 0.0687 | 0.0998 | 0.1929 |
+| random_forest | ml | 0.9269 | 0.1785 | 0.8933 | 0.0957 | 0.1358 | 0.1392 | 0.9955 | 0.1325 | 0.2173 | 0.0087 | 0.0467 | 0.0889 | 0.2155 |
+| xgboost | ml | 0.9088 | 0.2922 | 0.9044 | 0.1250 | 0.1892 | 0.1772 | 0.9966 | 0.2029 | 0.1510 | 0.0074 | 0.0438 | 0.0841 | 0.2052 |
+| stacking | ml | 0.9278 | 0.2315 | 0.9036 | 0.1131 | 0.1527 | 0.1329 | 0.9970 | 0.1795 | 0.9993 | 0.0072 | 0.0455 | 0.0880 | 0.2156 |
 
 
 ### Horizon h = 3
@@ -82,10 +131,10 @@ learning and deep — is scored on exactly these rows.
 | ohlson_o | formula | 0.8095 | 0.0119 | 0.8482 | 0.0263 | 0.0564 | 0.7808 | 0.7893 | 0.0293 | -3.6946 | 0.2107 | 0.2267 | 0.2444 | 0.2974 |
 | zmijewski | formula | 0.8189 | 0.0139 | 0.8545 | 0.0295 | 0.0688 | 0.6808 | 0.8526 | 0.0362 | 2.2860 | 0.1487 | 0.1719 | 0.1977 | 0.2750 |
 | logreg | ml | 0.8699 | 0.0305 | 0.8282 | 0.0518 | 0.1145 | 0.3154 | 0.9659 | 0.0700 | 0.9159 | 0.0394 | 0.0891 | 0.1443 | 0.3101 |
-| svm_rbf | ml | 0.8777 | 0.0385 | 0.8707 | 0.0609 | 0.1478 | 0.2038 | 0.9874 | 0.1160 | 0.9981 | 0.0190 | 0.0768 | 0.1410 | 0.3338 |
-| random_forest | ml | 0.9297 | 0.1658 | 0.8778 | 0.0893 | 0.1451 | 0.1269 | 0.9949 | 0.1692 | 0.2795 | 0.0121 | 0.0755 | 0.1460 | 0.3573 |
-| xgboost | ml | 0.9109 | 0.2903 | 0.8989 | 0.1355 | 0.1901 | 0.1692 | 0.9950 | 0.2167 | 0.3407 | 0.0116 | 0.0720 | 0.1390 | 0.3402 |
-| stacking | ml | 0.9231 | 0.2305 | 0.8958 | 0.1166 | 0.1618 | 0.1385 | 0.9953 | 0.1946 | 0.9997 | 0.0116 | 0.0742 | 0.1437 | 0.3523 |
+| svm_rbf | ml | 0.8784 | 0.0364 | 0.8734 | 0.0687 | 0.1262 | 0.2962 | 0.9724 | 0.0802 | 0.8780 | 0.0331 | 0.0842 | 0.1410 | 0.3114 |
+| random_forest | ml | 0.9262 | 0.1685 | 0.8913 | 0.0939 | 0.1560 | 0.1692 | 0.9919 | 0.1447 | 0.2313 | 0.0148 | 0.0751 | 0.1422 | 0.3433 |
+| xgboost | ml | 0.9191 | 0.3045 | 0.9032 | 0.1401 | 0.1868 | 0.1846 | 0.9936 | 0.1890 | 0.2534 | 0.0130 | 0.0722 | 0.1380 | 0.3354 |
+| stacking | ml | 0.9217 | 0.2281 | 0.8976 | 0.1186 | 0.1501 | 0.1192 | 0.9962 | 0.2026 | 0.9998 | 0.0109 | 0.0749 | 0.1460 | 0.3592 |
 
 
 ### Horizon h = 4
@@ -97,10 +146,10 @@ learning and deep — is scored on exactly these rows.
 | ohlson_o | formula | 0.8059 | 0.0140 | 0.8402 | 0.0343 | 0.0742 | 0.5785 | 0.8402 | 0.0396 | -2.5766 | 0.1627 | 0.2055 | 0.2530 | 0.3955 |
 | zmijewski | formula | 0.8092 | 0.0160 | 0.8413 | 0.0377 | 0.0865 | 0.6253 | 0.8537 | 0.0465 | 2.2860 | 0.1488 | 0.1868 | 0.2290 | 0.3557 |
 | logreg | ml | 0.8617 | 0.0314 | 0.8330 | 0.0595 | 0.1174 | 0.2727 | 0.9615 | 0.0748 | 0.8924 | 0.0462 | 0.1200 | 0.2019 | 0.4478 |
-| svm_rbf | ml | 0.8500 | 0.0393 | 0.7939 | 0.0467 | 0.1067 | 0.1543 | 0.9802 | 0.0815 | 0.9735 | 0.0291 | 0.1149 | 0.2102 | 0.4961 |
-| random_forest | ml | 0.9168 | 0.1837 | 0.8798 | 0.1028 | 0.1248 | 0.0937 | 0.9954 | 0.1868 | 0.3431 | 0.0148 | 0.1067 | 0.2088 | 0.5152 |
-| xgboost | ml | 0.9060 | 0.3295 | 0.8925 | 0.1485 | 0.1442 | 0.1019 | 0.9965 | 0.2467 | 0.4294 | 0.0136 | 0.1047 | 0.2059 | 0.5095 |
-| stacking | ml | 0.9168 | 0.2443 | 0.8865 | 0.1224 | 0.1734 | 0.1488 | 0.9935 | 0.2077 | 0.9994 | 0.0160 | 0.1023 | 0.1982 | 0.4860 |
+| svm_rbf | ml | 0.8788 | 0.0464 | 0.8280 | 0.0558 | 0.1013 | 0.0992 | 0.9902 | 0.1034 | 0.9886 | 0.0198 | 0.1112 | 0.2127 | 0.5172 |
+| random_forest | ml | 0.9217 | 0.1838 | 0.8849 | 0.1022 | 0.1574 | 0.1405 | 0.9927 | 0.1789 | 0.2890 | 0.0169 | 0.1041 | 0.2010 | 0.4915 |
+| xgboost | ml | 0.9098 | 0.3287 | 0.8950 | 0.1510 | 0.1361 | 0.0909 | 0.9972 | 0.2705 | 0.4671 | 0.0130 | 0.1052 | 0.2076 | 0.5149 |
+| stacking | ml | 0.9233 | 0.2504 | 0.8881 | 0.1228 | 0.1754 | 0.1515 | 0.9934 | 0.2083 | 0.9993 | 0.0160 | 0.1021 | 0.1977 | 0.4845 |
 
 
 ### Altman at its canonical cutoffs
@@ -595,10 +644,10 @@ losing to a constant that predicts no bankruptcy at all.
 
 | horizon | altman_zdp_test_roc_auc | best_ml_test_roc_auc | above_chance | below_best_ml |
 |---|---|---|---|---|
-| 1 | 0.8450 | 0.8940 | True | True |
-| 2 | 0.8299 | 0.9028 | True | True |
-| 3 | 0.8224 | 0.8989 | True | True |
-| 4 | 0.8122 | 0.8925 | True | True |
+| 1 | 0.8450 | 0.8948 | True | True |
+| 2 | 0.8299 | 0.9044 | True | True |
+| 3 | 0.8224 | 0.9032 | True | True |
+| 4 | 0.8122 | 0.8950 | True | True |
 
 
 **phase_c_gate**

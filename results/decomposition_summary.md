@@ -124,13 +124,20 @@ train + val — two years closer to the test window, and still strictly before
 it — tests that: if shift were the cause, the drop should shrink.  This is a
 diagnostic only; nothing fitted on val scores a headline number.
 
-| horizon | published_roc_auc | train_only_roc_auc | train_plus_val_roc_auc | roc_drop_train_only | roc_drop_train_plus_val | shift_explains_drop | roc_drop_cluster_ci_low | roc_drop_cluster_ci_high |
-|---|---|---|---|---|---|---|---|---|
-| 1 | 0.84504 | 0.82844 | 0.82910 | -0.01660 | -0.01594 | True | -0.06533 | 0.02460 |
-| 2 | 0.82988 | 0.80484 | 0.80486 | -0.02504 | -0.02502 | True | -0.06380 | 0.00955 |
-| 3 | 0.82244 | 0.79136 | 0.79118 | -0.03108 | -0.03125 | False | -0.06884 | 0.00428 |
-| 4 | 0.81225 | 0.77460 | 0.77464 | -0.03765 | -0.03760 | True | -0.07887 | -0.00092 |
+| horizon | published_roc_auc | train_only_roc_auc | train_plus_val_roc_auc | roc_drop_train_only | roc_drop_cluster_ci_low | roc_drop_cluster_ci_high | roc_recovery_from_refitting_on_train_plus_val | recovery_cluster_ci_low | recovery_cluster_ci_high | recovery_share_of_drop | shift_explains_drop |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0.84504 | 0.82844 | 0.82910 | -0.01660 | -0.06533 | 0.02460 | 0.00066 | 0.00023 | 0.00107 | 0.03979 | False |
+| 2 | 0.82988 | 0.80484 | 0.80486 | -0.02504 | -0.06380 | 0.00955 | 0.00002 | -0.00008 | 0.00011 | 0.00080 | False |
+| 3 | 0.82244 | 0.79136 | 0.79118 | -0.03108 | -0.06884 | 0.00428 | -0.00017 | -0.00036 | -0.00004 | -0.00562 | False |
+| 4 | 0.81225 | 0.77460 | 0.77464 | -0.03765 | -0.07887 | -0.00092 | 0.00004 | -0.00007 | 0.00016 | 0.00118 | False |
 
+
+Verdict per horizon:
+
+- h=1: shift does not explain the drop (recovers 4.0% of it, 95% CI [+0.00023, +0.00107])
+- h=2: shift does not explain the drop (recovers 0.1% of it, 95% CI [-0.00008, +0.00011])
+- h=3: shift does not explain the drop (recovers -0.6% of it, 95% CI [-0.00036, -0.00004])
+- h=4: shift does not explain the drop (recovers 0.1% of it, 95% CI [-0.00007, +0.00016])
 
 ## The same question without a neural network
 
@@ -140,14 +147,14 @@ across all eight quarters (40 inputs).  Same tuning budget, same row set.
 
 | name | horizon | n_inputs | roc_auc | pr_auc | recall | note |
 |---|---|---|---|---|---|---|
-| decompB_xgb_t0 | 1 | 5 | 0.8621 | 0.0665 | 0.0833 | Altman's five ratios at t-0 only |
+| decompB_xgb_t0 | 1 | 5 | 0.8584 | 0.0643 | 0.0833 | Altman's five ratios at t-0 only |
 | decompC_xgb | 1 | 40 | 0.8683 | 0.1655 | 0.2333 | Altman's five ratios across all eight quarters (40 inputs) |
-| decompB_xgb_t0 | 2 | 5 | 0.8690 | 0.0478 | 0.0316 | Altman's five ratios at t-0 only |
-| decompC_xgb | 2 | 40 | 0.8668 | 0.1414 | 0.1899 | Altman's five ratios across all eight quarters (40 inputs) |
-| decompB_xgb_t0 | 3 | 5 | 0.8583 | 0.0570 | 0.1115 | Altman's five ratios at t-0 only |
-| decompC_xgb | 3 | 40 | 0.8599 | 0.1272 | 0.1192 | Altman's five ratios across all eight quarters (40 inputs) |
+| decompB_xgb_t0 | 2 | 5 | 0.8782 | 0.0484 | 0.0886 | Altman's five ratios at t-0 only |
+| decompC_xgb | 2 | 40 | 0.8773 | 0.1466 | 0.2278 | Altman's five ratios across all eight quarters (40 inputs) |
+| decompB_xgb_t0 | 3 | 5 | 0.8614 | 0.0557 | 0.0731 | Altman's five ratios at t-0 only |
+| decompC_xgb | 3 | 40 | 0.8638 | 0.1248 | 0.0923 | Altman's five ratios across all eight quarters (40 inputs) |
 | decompB_xgb_t0 | 4 | 5 | 0.8563 | 0.0648 | 0.0303 | Altman's five ratios at t-0 only |
-| decompC_xgb | 4 | 40 | 0.8423 | 0.0984 | 0.0523 | Altman's five ratios across all eight quarters (40 inputs) |
+| decompC_xgb | 4 | 40 | 0.8548 | 0.1050 | 0.0799 | Altman's five ratios across all eight quarters (40 inputs) |
 
 
 ## Is the finding LSTM-specific?

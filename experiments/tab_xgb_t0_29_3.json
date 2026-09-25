@@ -2,7 +2,13 @@
   "key": "xgb_t0_29_3",
   "model": "xgboost",
   "horizon": 3,
-  "seed": 0,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
   "feature_cols": null,
   "t0_only": true,
   "with_indicators": true,
@@ -18,7 +24,8 @@
     "min_child_weight": 20.0
   },
   "note": "29 ratios at t-0 plus the two indicators; no time axis",
-  "models_sha": "85c3df3",
+  "aggregation": "per-seed fits plus their seed-averaged ensemble",
+  "models_sha": "5a5a82c",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-25T03:43:31"
+  "timestamp": "2026-09-25T20:04:21"
 }

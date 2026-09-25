@@ -1,0 +1,6 @@
+| horizon | t0_29_pr_auc | t0_25_pr_auc | window_29_pr_auc | window_25_pr_auc | growth_worth_to_t0 | growth_worth_to_t0_ci_low | growth_worth_to_t0_ci_high | growth_worth_to_window | growth_worth_to_window_ci_low | growth_worth_to_window_ci_high | window_gap_with_growth | window_gap_with_growth_ci_low | window_gap_with_growth_ci_high | window_gap_without_growth | window_gap_without_growth_ci_low | window_gap_without_growth_ci_high | gap_widens_without_growth | growth_worth_more_to_t0 | supports_explanation |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0.1042 | 0.1051 | 0.1595 | 0.1499 | -0.0009 | -0.0649 | 0.0674 | 0.0096 | -0.0300 | 0.0479 | 0.0553 | -0.0253 | 0.1332 | 0.0448 | -0.0276 | 0.1182 | False | False | False |
+| 2 | 0.0938 | 0.0772 | 0.1250 | 0.1479 | 0.0166 | -0.0045 | 0.0350 | -0.0229 | -0.0525 | -0.0002 | 0.0312 | -0.0048 | 0.0675 | 0.0707 | 0.0293 | 0.1125 | True | True | True |
+| 3 | 0.1323 | 0.0875 | 0.1401 | 0.1318 | 0.0448 | 0.0141 | 0.0732 | 0.0083 | -0.0184 | 0.0300 | 0.0078 | -0.0276 | 0.0401 | 0.0443 | 0.0076 | 0.0813 | True | True | True |
+| 4 | 0.1151 | 0.0925 | 0.1510 | 0.1362 | 0.0226 | 0.0030 | 0.0428 | 0.0149 | -0.0112 | 0.0371 | 0.0359 | -0.0024 | 0.0750 | 0.0437 | 0.0099 | 0.0882 | True | True | True |
