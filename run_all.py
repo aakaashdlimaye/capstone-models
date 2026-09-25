@@ -20,7 +20,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parent
 
-PHASES = ["a", "b", "c", "d", "e", "f", "g", "audit", "report"]
+PHASES = ["a", "b", "c", "d", "e", "f", "g", "h", "audit", "report"]
 
 
 def parse_args(argv=None):
@@ -98,6 +98,9 @@ def main(argv=None) -> int:
     if "g" in todo:
         from src import phase_g
         out["g"] = phase_g.main(full=full, seeds=seeds, n_trials=trials, force=a.force)
+    if "h" in todo:
+        from src import phase_h
+        out["h"] = phase_h.main(full=full, seeds=seeds, n_trials=trials, force=a.force)
     if "audit" in todo:
         from src import leakage
         out["audit"] = leakage.main(full=full)

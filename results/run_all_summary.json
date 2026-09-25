@@ -36,6 +36,13 @@
       "gate_pass": true,
       "best_arch": "transformer",
       "n_runs": 110
+    },
+    "h": {
+      "h1_rows": 4,
+      "h2_rows": 4,
+      "h3_rows": 20,
+      "precision_at_k_rows": 160,
+      "sector_cells_reported": 40
     }
   },
   "universe": "full",
@@ -47,7 +54,7 @@
     4
   ],
   "tuning_trials": 30,
-  "wall_seconds_total": 1190.900678200007,
+  "wall_seconds_total": 18758.30947789998,
   "invocations": [
     {
       "phases": [
@@ -90,9 +97,84 @@
       "models_sha": "75f3e94",
       "dataset_sha": "b16eb17",
       "timestamp": "2026-09-18T17:31:02"
+    },
+    {
+      "phases": [
+        "d"
+      ],
+      "wall_seconds": 3294.675474799995,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "85c3df3",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-25T01:46:09"
+    },
+    {
+      "phases": [
+        "c",
+        "e",
+        "f",
+        "g",
+        "h",
+        "audit",
+        "report"
+      ],
+      "wall_seconds": 9782.796176500007,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "85c3df3",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-25T04:29:44"
+    },
+    {
+      "phases": [
+        "e",
+        "report"
+      ],
+      "wall_seconds": 4488.143503399973,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "85c3df3",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-25T05:48:02"
+    },
+    {
+      "phases": [
+        "report"
+      ],
+      "wall_seconds": 1.7936449999979232,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "85c3df3",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-25T05:49:39"
     }
   ],
-  "models_sha": "75f3e94",
+  "models_sha": "85c3df3",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-18T17:31:02"
+  "timestamp": "2026-09-25T05:49:39"
 }

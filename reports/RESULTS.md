@@ -5,10 +5,24 @@ No number in this file is typed by hand.
 
 - Universe: **full**
 - Dataset repository SHA: `b16eb17`
-- Models repository SHA: `75f3e94`
+- Models repository SHA: `85c3df3`
 - Seeds: `[0, 1, 2, 3, 4]`; deep results are mean ± std over 5 seeds unless stated otherwise.
-- Generated: 2026-09-18T17:31:00
-- Total measured compute: **13.70 h** over 275 cached deep runs plus the logged tuning trials.
+- Generated: 2026-09-25T05:49:37
+- Total measured compute: **14.61 h** over 315 cached deep runs plus the logged tuning trials.
+
+## Changes from previous run
+
+Every watched number whose relative change exceeded 10%, old against new.  3,930 numbers watched, 840 newly added this run.
+
+**4 numbers moved.**
+
+| file | row | metric | old | new | rel_change |
+|---|---|---|---|---|---|
+| decomposition_all.csv | 4 / C_lstm | pr_auc_diff | 0.0886 | 0.0488 | 0.4499 |
+| decomposition_all.csv | 3 / C_lstm | pr_auc_diff | 0.1022 | 0.0633 | 0.3805 |
+| decomposition_all.csv | 2 / C_lstm | pr_auc_diff | 0.1097 | 0.0713 | 0.3498 |
+| decomposition_all.csv | 1 / C_lstm | pr_auc_diff | 0.0995 | 0.0749 | 0.2473 |
+
 
 Read PR-AUC first.  At a window-level positive rate of roughly 1% (0.18% at
 h=1) ROC-AUC flatters every model, which is exactly the point Contribution 5
@@ -266,6 +280,15 @@ cut, which shows up in expected cost rather than in PR-AUC:
 
 ![cost heatmap h=1](../results/figures/imbalance_cost_heatmap_h1.png)
 
+Read from `imbalance_ablation_h1.csv`, per architecture, because the untreated baseline is not the same number across architectures:
+
+- **bilstm**: untreated PR-AUC 0.0723; best training-side treatment is class_weight at 0.0591 (-0.0132); class_weight, smote, focal reduce it.  Lowest expected cost at 50:1 comes from `cost_threshold_1to20` (0.0832).
+- **cnn_lstm_attn**: untreated PR-AUC 0.0396; best training-side treatment is class_weight at 0.0398 (+0.0002); smote, focal reduce it.  Lowest expected cost at 50:1 comes from `cost_threshold_1to20` (0.0872).
+- **lstm**: untreated PR-AUC 0.0679; best training-side treatment is class_weight at 0.0649 (-0.0029); class_weight, smote, focal reduce it.  Lowest expected cost at 50:1 comes from `cost_threshold_1to20` (0.0817).
+- **transformer**: untreated PR-AUC 0.0411; best training-side treatment is class_weight at 0.0774 (+0.0363); smote, focal reduce it.  Lowest expected cost at 50:1 comes from `class_weight` (0.0847).
+
+The `cost_threshold_*` rows share the untreated model's ranking and differ only in where it is cut, so their PR-AUC is identical to `none` by construction; they move expected cost, not PR-AUC.
+
 ### Horizon h = 4
 
 | architecture | treatment | ROC-AUC | PR-AUC | F1 | recall | specificity | cost 1:1 | cost 1:10 | cost 1:20 | cost 1:50 |
@@ -312,6 +335,15 @@ cut, which shows up in expected cost rather than in PR-AUC:
 
 ![cost heatmap h=4](../results/figures/imbalance_cost_heatmap_h4.png)
 
+Read from `imbalance_ablation_h4.csv`, per architecture, because the untreated baseline is not the same number across architectures:
+
+- **bilstm**: untreated PR-AUC 0.0436; best training-side treatment is smote at 0.0404 (-0.0032); class_weight, smote, focal reduce it.  Lowest expected cost at 50:1 comes from `cost_threshold_1to50` (0.4947).
+- **cnn_lstm_attn**: untreated PR-AUC 0.0434; best training-side treatment is focal at 0.0445 (+0.0011).  Lowest expected cost at 50:1 comes from `cost_threshold_1to50` (0.4927).
+- **lstm**: untreated PR-AUC 0.0418; best training-side treatment is smote at 0.0410 (-0.0008); class_weight, smote, focal reduce it.  Lowest expected cost at 50:1 comes from `cost_threshold_1to50` (0.5059).
+- **transformer**: untreated PR-AUC 0.0656; best training-side treatment is class_weight at 0.0692 (+0.0037); smote, focal reduce it.  Lowest expected cost at 50:1 comes from `cost_threshold_1to50` (0.4321).
+
+The `cost_threshold_*` rows share the untreated model's ranking and differ only in where it is cut, so their PR-AUC is identical to `none` by construction; they move expected cost, not PR-AUC.
+
 ## 5. Protocol audit — reproducing the 91–99% accuracy
 
 The same LSTM, run three ways.  The only changes between rows are
@@ -320,10 +352,14 @@ methodological.
 | horizon | protocol | n_test | test_positive_rate | accuracy_mean | accuracy_std | pr_auc_mean | pr_auc_std | roc_auc_mean | recall_mean | f1_mean | n_seeds |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | inflated | 55761.0000 | 0.4991 | 0.9992 | 0.0001 | 0.9998 | 0.0001 | 0.9999 | 0.9999 | 0.9992 | 5 |
+| 1 | inflated_natural_test | 27976.0000 | 0.0017 | 0.9985 | 0.0004 | 0.8939 | 0.0712 | 0.9999 | 1.0000 | 0.6986 | 5 |
 | 1 | half_fixed | 65469.8000 | 0.5088 | 0.8444 | 0.0065 | 0.9511 | 0.0114 | 0.9347 | 0.6988 | 0.8204 | 5 |
+| 1 | half_fixed_natural_test | 32216.0000 | 0.0019 | 0.9946 | 0.0038 | 0.3792 | 0.1220 | 0.8724 | 0.6367 | 0.3499 | 5 |
 | 1 | correct | 32216.0000 | 0.0019 | 0.9974 | 0.0002 | 0.0217 | 0.0114 | 0.7499 | 0.0367 | 0.0504 | 5 |
 | 4 | inflated | 55278.0000 | 0.4990 | 0.9974 | 0.0006 | 0.9996 | 0.0001 | 0.9998 | 0.9994 | 0.9974 | 5 |
+| 4 | inflated_natural_test | 27979.2000 | 0.0101 | 0.9955 | 0.0012 | 0.9515 | 0.0123 | 0.9996 | 0.9993 | 0.8207 | 5 |
 | 4 | half_fixed | 66307.0000 | 0.5196 | 0.8649 | 0.0111 | 0.9649 | 0.0048 | 0.9587 | 0.7581 | 0.8535 | 5 |
+| 4 | half_fixed_natural_test | 32216.0000 | 0.0113 | 0.9769 | 0.0028 | 0.3913 | 0.0352 | 0.9264 | 0.6645 | 0.3944 | 5 |
 | 4 | correct | 32216.0000 | 0.0113 | 0.9851 | 0.0007 | 0.0410 | 0.0060 | 0.7758 | 0.0331 | 0.0464 | 5 |
 
 
@@ -336,78 +372,88 @@ two large, offsetting accuracy moves cancel, so `model_beats_majority_class` is
 the column that matters — where it is false, a model reporting >99% accuracy is
 losing to a constant that predicts no bankruptcy at all.
 
-| horizon | inflated_pr_auc | half_fixed_pr_auc | correct_pr_auc | pr_auc_lost_to_chronological_split | pr_auc_lost_to_resampling_inside_train | total_pr_auc_collapse | share_chronological_split | share_resampling_inside_train | inflated_over_correct_pr_auc | inflated_accuracy | half_fixed_accuracy | correct_accuracy | correct_test_base_rate | majority_class_accuracy | model_beats_majority_class | correct_pr_auc_over_base_rate |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | 0.9998 | 0.9511 | 0.0217 | 0.0488 | 0.9294 | 0.9782 | 0.0499 | 0.9501 | 46.0827 | 0.9992 | 0.8444 | 0.9974 | 0.0019 | 0.9981 | False | 11.6498 |
-| 4 | 0.9996 | 0.9649 | 0.0410 | 0.0347 | 0.9239 | 0.9587 | 0.0362 | 0.9638 | 24.4040 | 0.9974 | 0.8649 | 0.9851 | 0.0113 | 0.9887 | False | 3.6354 |
+| horizon | inflated_roc_auc | half_fixed_roc_auc | correct_roc_auc | roc_auc_lost_to_chronological_split | roc_auc_lost_to_resampling_inside_train | total_roc_auc_collapse | share_chronological_split | share_resampling_inside_train | inflated_pr_auc | half_fixed_pr_auc | correct_pr_auc | inflated_pr_auc_lift | half_fixed_pr_auc_lift | correct_pr_auc_lift | inflated_test_base_rate | correct_test_base_rate | inflated_accuracy | half_fixed_accuracy | correct_accuracy | majority_class_accuracy | model_beats_majority_class | natural_inflated_pr_auc | natural_half_fixed_pr_auc | natural_inflated_base_rate | pr_auc_natural_lost_to_chronological_split | pr_auc_natural_lost_to_resampling_inside_train | pr_auc_natural_share_chronological_split | pr_auc_natural_share_resampling_inside_train | natural_inflated_over_correct_pr_auc |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0.9999 | 0.9347 | 0.7499 | 0.0652 | 0.1848 | 0.2501 | 0.2609 | 0.7391 | 0.9998 | 0.9511 | 0.0217 | 2.0032 | 1.8692 | 11.6498 | 0.4991 | 0.0019 | 0.9992 | 0.8444 | 0.9974 | 0.9981 | False | 0.8939 | 0.3792 | 0.0017 | 0.5147 | 0.3575 | 0.5901 | 0.4099 | 41.2013 |
+| 4 | 0.9998 | 0.9587 | 0.7758 | 0.0410 | 0.1830 | 0.2240 | 0.1832 | 0.8168 | 0.9996 | 0.9649 | 0.0410 | 2.0034 | 1.8570 | 3.6354 | 0.4990 | 0.0113 | 0.9974 | 0.8649 | 0.9851 | 0.9887 | False | 0.9515 | 0.3913 | 0.0101 | 0.5602 | 0.3503 | 0.6153 | 0.3847 | 23.2283 |
 
 
 | dataset | protocol | accuracy_mean | accuracy_std | pr_auc_mean | pr_auc_std | roc_auc_mean | recall_mean | test_positive_rate | n_seeds |
 |---|---|---|---|---|---|---|---|---|---|
 | UCI Polish year 1 (single snapshot) | correct | 0.9621 | 0.0031 | 0.4939 | 0.0185 | 0.9306 | 0.5854 | 0.0389 | 5 |
 | UCI Polish year 1 (single snapshot) | inflated | 0.9881 | 0.0017 | 0.9990 | 0.0002 | 0.9991 | 0.9914 | 0.4999 | 5 |
+| UCI Polish year 1 (single snapshot) | inflated_natural_test | 0.9838 | 0.0027 | 0.9554 | 0.0219 | 0.9982 | 0.9605 | 0.0398 | 5 |
 | UCI Taiwanese (6,819 firms, single snapshot) | correct | 0.9361 | 0.0067 | 0.3192 | 0.0057 | 0.9286 | 0.5697 | 0.0323 | 5 |
 | UCI Taiwanese (6,819 firms, single snapshot) | inflated | 0.9796 | 0.0035 | 0.9985 | 0.0004 | 0.9985 | 0.9953 | 0.5000 | 5 |
+| UCI Taiwanese (6,819 firms, single snapshot) | inflated_natural_test | 0.9644 | 0.0048 | 0.8766 | 0.0308 | 0.9940 | 0.9780 | 0.0331 | 5 |
 
 
 ## 6. Decomposition — why the 1968 formula underperforms
 
 ### Horizon h = 1
 
-| model | roc_auc | pr_auc | f1 | recall | specificity | step | delong_roc_diff | delong_ci_low | delong_ci_high | delong_p | pr_auc_diff | pr_ci_low | pr_ci_high | mcnemar_b | mcnemar_c | mcnemar_p |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A_zdp | 0.8450 | 0.0066 | 0.0121 | 0.8667 | 0.7353 |  |  |  |  |  |  |  |  |  |  |  |
-| B_levels | 0.8284 | 0.0081 | 0.0185 | 0.6500 | 0.8717 | A_zdp -> B_levels | -0.0166 | -0.0608 | 0.0277 | 0.4622 | 0.0015 | -0.0001 | 0.0036 | 984.0000 | 5357.0000 | 0.0000 |
-| C_lstm | 0.8741 | 0.1077 | 0.2376 | 0.2000 | 0.9991 | B_levels -> C_lstm | 0.0456 | 0.0033 | 0.0880 | 0.0346 | 0.0996 | 0.0419 | 0.1931 | 33.0000 | 4104.0000 | 0.0000 |
-| D_lstm | 0.8625 | 0.0847 | 0.1649 | 0.1333 | 0.9991 | C_lstm -> D_lstm | -0.0116 | -0.0474 | 0.0242 | 0.5261 | -0.0230 | -0.1053 | 0.0521 | 32.0000 | 28.0000 | 0.6985 |
+| model | roc_auc | pr_auc | f1 | recall | specificity | step | pr_auc_diff |
+|---|---|---|---|---|---|---|---|
+| A_zdp | 0.8450 | 0.0066 | 0.0121 | 0.8667 | 0.7353 |  |  |
+| B_levels | 0.8284 | 0.0081 | 0.0185 | 0.6500 | 0.8717 | A_zdp -> B_levels | 0.0015 |
+| B_tensor | 0.8059 | 0.0082 | 0.0224 | 0.4333 | 0.9306 | B_levels -> B_tensor | 0.0001 |
+| B_mlp_t0 | 0.8342 | 0.0328 | 0.1020 | 0.0833 | 0.9990 | B_tensor -> B_mlp_t0 | 0.0246 |
+| C_lstm | 0.8741 | 0.1077 | 0.2376 | 0.2000 | 0.9991 | B_mlp_t0 -> C_lstm | 0.0749 |
+| D_lstm | 0.8625 | 0.0847 | 0.1649 | 0.1333 | 0.9991 | C_lstm -> D_lstm | -0.0230 |
 
 
 ![decomposition PR curves h=1](../results/figures/decomposition_pr_h1.png)
 
 ### Horizon h = 2
 
-| model | roc_auc | pr_auc | f1 | recall | specificity | step | delong_roc_diff | delong_ci_low | delong_ci_high | delong_p | pr_auc_diff | pr_ci_low | pr_ci_high | mcnemar_b | mcnemar_c | mcnemar_p |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A_zdp | 0.8299 | 0.0152 | 0.0303 | 0.8354 | 0.7369 |  |  |  |  |  |  |  |  |  |  |  |
-| B_levels | 0.8048 | 0.0164 | 0.0400 | 0.5506 | 0.8719 | A_zdp -> B_levels | -0.0250 | -0.0553 | 0.0052 | 0.1047 | 0.0012 | -0.0010 | 0.0038 | 1020.0000 | 5300.0000 | 0.0000 |
-| C_lstm | 0.8820 | 0.1271 | 0.1930 | 0.2278 | 0.9944 | B_levels -> C_lstm | 0.0771 | 0.0520 | 0.1022 | 0.0000 | 0.1107 | 0.0672 | 0.1693 | 106.0000 | 3984.0000 | 0.0000 |
-| D_lstm | 0.8663 | 0.0683 | 0.0971 | 0.0633 | 0.9988 | C_lstm -> D_lstm | -0.0156 | -0.0371 | 0.0058 | 0.1524 | -0.0588 | -0.1094 | -0.0142 | 59.0000 | 174.0000 | 0.0000 |
+| model | roc_auc | pr_auc | f1 | recall | specificity | step | pr_auc_diff |
+|---|---|---|---|---|---|---|---|
+| A_zdp | 0.8299 | 0.0152 | 0.0303 | 0.8354 | 0.7369 |  |  |
+| B_levels | 0.8048 | 0.0164 | 0.0400 | 0.5506 | 0.8719 | A_zdp -> B_levels | 0.0012 |
+| B_tensor | 0.8033 | 0.0174 | 0.0363 | 0.5443 | 0.8600 | B_levels -> B_tensor | 0.0010 |
+| B_mlp_t0 | 0.8863 | 0.0558 | 0.0830 | 0.0696 | 0.9970 | B_tensor -> B_mlp_t0 | 0.0384 |
+| C_lstm | 0.8820 | 0.1271 | 0.1930 | 0.2278 | 0.9944 | B_mlp_t0 -> C_lstm | 0.0713 |
+| D_lstm | 0.8663 | 0.0683 | 0.0971 | 0.0633 | 0.9988 | C_lstm -> D_lstm | -0.0588 |
 
 
 ![decomposition PR curves h=2](../results/figures/decomposition_pr_h2.png)
 
 ### Horizon h = 3
 
-| model | roc_auc | pr_auc | f1 | recall | specificity | step | delong_roc_diff | delong_ci_low | delong_ci_high | delong_p | pr_auc_diff | pr_ci_low | pr_ci_high | mcnemar_b | mcnemar_c | mcnemar_p |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A_zdp | 0.8224 | 0.0233 | 0.0483 | 0.8192 | 0.7386 |  |  |  |  |  |  |  |  |  |  |  |
-| B_levels | 0.7914 | 0.0246 | 0.0590 | 0.5038 | 0.8733 | A_zdp -> B_levels | -0.0311 | -0.0561 | -0.0061 | 0.0147 | 0.0013 | -0.0014 | 0.0045 | 1056.0000 | 5276.0000 | 0.0000 |
-| C_lstm | 0.8918 | 0.1288 | 0.1503 | 0.1000 | 0.9981 | B_levels -> C_lstm | 0.1004 | 0.0805 | 0.1203 | 0.0000 | 0.1041 | 0.0714 | 0.1447 | 124.0000 | 4009.0000 | 0.0000 |
-| D_lstm | 0.7757 | 0.0384 | 0.0339 | 0.0192 | 0.9991 | C_lstm -> D_lstm | -0.1161 | -0.1408 | -0.0914 | 0.0000 | -0.0904 | -0.1264 | -0.0584 | 51.0000 | 60.0000 | 0.4477 |
+| model | roc_auc | pr_auc | f1 | recall | specificity | step | pr_auc_diff |
+|---|---|---|---|---|---|---|---|
+| A_zdp | 0.8224 | 0.0233 | 0.0483 | 0.8192 | 0.7386 |  |  |
+| B_levels | 0.7914 | 0.0246 | 0.0590 | 0.5038 | 0.8733 | A_zdp -> B_levels | 0.0013 |
+| B_tensor | 0.7904 | 0.0266 | 0.0589 | 0.4577 | 0.8853 | B_levels -> B_tensor | 0.0020 |
+| B_mlp_t0 | 0.8761 | 0.0655 | 0.0537 | 0.0308 | 0.9991 | B_tensor -> B_mlp_t0 | 0.0389 |
+| C_lstm | 0.8918 | 0.1288 | 0.1503 | 0.1000 | 0.9981 | B_mlp_t0 -> C_lstm | 0.0633 |
+| D_lstm | 0.7757 | 0.0384 | 0.0339 | 0.0192 | 0.9991 | C_lstm -> D_lstm | -0.0904 |
 
 
 ![decomposition PR curves h=3](../results/figures/decomposition_pr_h3.png)
 
 ### Horizon h = 4
 
-| model | roc_auc | pr_auc | f1 | recall | specificity | step | delong_roc_diff | delong_ci_low | delong_ci_high | delong_p | pr_auc_diff | pr_ci_low | pr_ci_high | mcnemar_b | mcnemar_c | mcnemar_p |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A_zdp | 0.8122 | 0.0305 | 0.0641 | 0.7879 | 0.7401 |  |  |  |  |  |  |  |  |  |  |  |
-| B_levels | 0.7746 | 0.0315 | 0.0732 | 0.4601 | 0.8734 | A_zdp -> B_levels | -0.0376 | -0.0603 | -0.0150 | 0.0011 | 0.0010 | -0.0021 | 0.0047 | 1119.0000 | 5245.0000 | 0.0000 |
-| C_lstm | 0.8766 | 0.1230 | 0.1381 | 0.0964 | 0.9966 | B_levels -> C_lstm | 0.1020 | 0.0854 | 0.1186 | 0.0000 | 0.0915 | 0.0657 | 0.1254 | 169.0000 | 3962.0000 | 0.0000 |
-| D_lstm | 0.7684 | 0.0466 | 0.0582 | 0.0358 | 0.9978 | C_lstm -> D_lstm | -0.1082 | -0.1302 | -0.0863 | 0.0000 | -0.0764 | -0.1088 | -0.0504 | 92.0000 | 108.0000 | 0.2888 |
+| model | roc_auc | pr_auc | f1 | recall | specificity | step | pr_auc_diff |
+|---|---|---|---|---|---|---|---|
+| A_zdp | 0.8122 | 0.0305 | 0.0641 | 0.7879 | 0.7401 |  |  |
+| B_levels | 0.7746 | 0.0315 | 0.0732 | 0.4601 | 0.8734 | A_zdp -> B_levels | 0.0010 |
+| B_tensor | 0.7731 | 0.0344 | 0.0746 | 0.3829 | 0.8988 | B_levels -> B_tensor | 0.0028 |
+| B_mlp_t0 | 0.8699 | 0.0742 | 0.1148 | 0.1185 | 0.9892 | B_tensor -> B_mlp_t0 | 0.0399 |
+| C_lstm | 0.8766 | 0.1230 | 0.1381 | 0.0964 | 0.9966 | B_mlp_t0 -> C_lstm | 0.0488 |
+| D_lstm | 0.7684 | 0.0466 | 0.0582 | 0.0358 | 0.9978 | C_lstm -> D_lstm | -0.0764 |
 
 
 ![decomposition PR curves h=4](../results/figures/decomposition_pr_h4.png)
 
 ### Share of the A→D gap attributable to each cause
 
-| horizon | roc_auc_A | roc_auc_D | roc_auc_net_gap | roc_auc_total_abs_movement | roc_auc_gap_A_zdp->B_levels | roc_auc_share_A_zdp->B_levels | roc_auc_direction_A_zdp->B_levels | roc_auc_gap_B_levels->C_lstm | roc_auc_share_B_levels->C_lstm | roc_auc_direction_B_levels->C_lstm | roc_auc_gap_C_lstm->D_lstm | roc_auc_share_C_lstm->D_lstm | roc_auc_direction_C_lstm->D_lstm | pr_auc_A | pr_auc_D | pr_auc_net_gap | pr_auc_total_abs_movement | pr_auc_gap_A_zdp->B_levels | pr_auc_share_A_zdp->B_levels | pr_auc_direction_A_zdp->B_levels | pr_auc_gap_B_levels->C_lstm | pr_auc_share_B_levels->C_lstm | pr_auc_direction_B_levels->C_lstm | pr_auc_gap_C_lstm->D_lstm | pr_auc_share_C_lstm->D_lstm | pr_auc_direction_C_lstm->D_lstm |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | 0.8450 | 0.8625 | 0.0175 | 0.0738 | -0.0166 | 0.2248 | degrades | 0.0456 | 0.6183 | improves | -0.0116 | 0.1569 | degrades | 0.0066 | 0.0847 | 0.0781 | 0.1241 | 0.0015 | 0.0122 | improves | 0.0996 | 0.8024 | improves | -0.0230 | 0.1855 | degrades |
-| 2 | 0.8299 | 0.8663 | 0.0364 | 0.1178 | -0.0250 | 0.2126 | degrades | 0.0771 | 0.6547 | improves | -0.0156 | 0.1328 | degrades | 0.0152 | 0.0683 | 0.0531 | 0.1707 | 0.0012 | 0.0071 | improves | 0.1107 | 0.6484 | improves | -0.0588 | 0.3445 | degrades |
-| 3 | 0.8224 | 0.7757 | -0.0468 | 0.2475 | -0.0311 | 0.1255 | degrades | 0.1004 | 0.4056 | improves | -0.1161 | 0.4689 | degrades | 0.0233 | 0.0384 | 0.0150 | 0.1958 | 0.0013 | 0.0066 | improves | 0.1041 | 0.5317 | improves | -0.0904 | 0.4616 | degrades |
-| 4 | 0.8122 | 0.7684 | -0.0438 | 0.2479 | -0.0376 | 0.1519 | degrades | 0.1020 | 0.4116 | improves | -0.1082 | 0.4365 | degrades | 0.0305 | 0.0466 | 0.0161 | 0.1689 | 0.0010 | 0.0062 | improves | 0.0915 | 0.5414 | improves | -0.0764 | 0.4524 | degrades |
+| horizon | roc_auc_A | roc_auc_D | roc_auc_net_gap | roc_auc_total_abs_movement | roc_auc_gap_A_zdp->B_levels | roc_auc_share_A_zdp->B_levels | roc_auc_direction_A_zdp->B_levels | roc_auc_gap_B_levels->B_tensor | roc_auc_share_B_levels->B_tensor | roc_auc_direction_B_levels->B_tensor | roc_auc_gap_B_tensor->B_mlp_t0 | roc_auc_share_B_tensor->B_mlp_t0 | roc_auc_direction_B_tensor->B_mlp_t0 | roc_auc_gap_B_mlp_t0->C_lstm | roc_auc_share_B_mlp_t0->C_lstm | roc_auc_direction_B_mlp_t0->C_lstm | roc_auc_gap_C_lstm->D_lstm | roc_auc_share_C_lstm->D_lstm | roc_auc_direction_C_lstm->D_lstm | pr_auc_A | pr_auc_D | pr_auc_net_gap | pr_auc_total_abs_movement | pr_auc_gap_A_zdp->B_levels | pr_auc_share_A_zdp->B_levels | pr_auc_direction_A_zdp->B_levels | pr_auc_gap_B_levels->B_tensor | pr_auc_share_B_levels->B_tensor | pr_auc_direction_B_levels->B_tensor | pr_auc_gap_B_tensor->B_mlp_t0 | pr_auc_share_B_tensor->B_mlp_t0 | pr_auc_direction_B_tensor->B_mlp_t0 | pr_auc_gap_B_mlp_t0->C_lstm | pr_auc_share_B_mlp_t0->C_lstm | pr_auc_direction_B_mlp_t0->C_lstm | pr_auc_gap_C_lstm->D_lstm | pr_auc_share_C_lstm->D_lstm | pr_auc_direction_C_lstm->D_lstm |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 1 | 0.8450 | 0.8625 | 0.0175 | 0.1189 | -0.0166 | 0.1396 | degrades | -0.0225 | 0.1896 | degrades | 0.0283 | 0.2383 | improves | 0.0399 | 0.3352 | improves | -0.0116 | 0.0974 | degrades | 0.0066 | 0.0847 | 0.0781 | 0.1241 | 0.0015 | 0.0122 | improves | 0.0001 | 0.0005 | improves | 0.0246 | 0.1983 | improves | 0.0749 | 0.6035 | improves | -0.0230 | 0.1855 | degrades |
+| 2 | 0.8299 | 0.8663 | 0.0364 | 0.1296 | -0.0250 | 0.1932 | degrades | -0.0016 | 0.0121 | degrades | 0.0830 | 0.6406 | improves | -0.0043 | 0.0335 | degrades | -0.0156 | 0.1207 | degrades | 0.0152 | 0.0683 | 0.0531 | 0.1707 | 0.0012 | 0.0071 | improves | 0.0010 | 0.0058 | improves | 0.0384 | 0.2248 | improves | 0.0713 | 0.4178 | improves | -0.0588 | 0.3445 | degrades |
+| 3 | 0.8224 | 0.7757 | -0.0468 | 0.2495 | -0.0311 | 0.1246 | degrades | -0.0010 | 0.0039 | degrades | 0.0857 | 0.3435 | improves | 0.0157 | 0.0628 | improves | -0.1161 | 0.4652 | degrades | 0.0233 | 0.0384 | 0.0150 | 0.1958 | 0.0013 | 0.0066 | improves | 0.0020 | 0.0101 | improves | 0.0389 | 0.1985 | improves | 0.0633 | 0.3232 | improves | -0.0904 | 0.4616 | degrades |
+| 4 | 0.8122 | 0.7684 | -0.0438 | 0.2508 | -0.0376 | 0.1501 | degrades | -0.0015 | 0.0059 | degrades | 0.0967 | 0.3856 | improves | 0.0068 | 0.0270 | improves | -0.1082 | 0.4314 | degrades | 0.0305 | 0.0466 | 0.0161 | 0.1689 | 0.0010 | 0.0062 | improves | 0.0028 | 0.0168 | improves | 0.0399 | 0.2360 | improves | 0.0488 | 0.2886 | improves | -0.0764 | 0.4524 | degrades |
 
 
 ### Missingness sanity check
@@ -454,8 +500,8 @@ losing to a constant that predicts no bankruptcy at all.
 | 1 | transformer | transformer | all_positive | 0.7619 | 0.0280 | 0.5714 | t-0 | t-0 | True |
 | 1 | cnn_lstm_attn | transformer | true_positive | 0.4880 | 0.2199 | 0.3858 | t-1 | t-0 | False |
 | 1 | cnn_lstm_attn | transformer | all_positive | 0.4880 | 0.2199 | 0.3858 | t-1 | t-0 | False |
-| 4 | transformer | transformer | true_positive | 0.8571 | 0.0065 | 0.7143 | t-0 | t-0 | True |
-| 4 | transformer | transformer | all_positive | 0.6905 | 0.0580 | 0.5714 | t-0 | t-0 | True |
+| 4 | transformer | transformer | true_positive | 0.8810 | 0.0039 | 0.7143 | t-0 | t-0 | True |
+| 4 | transformer | transformer | all_positive | 0.7619 | 0.0280 | 0.5714 | t-0 | t-0 | True |
 | 4 | cnn_lstm_attn | transformer | true_positive | 0.6831 | 0.0618 | 0.6172 | t-1 | t-0 | False |
 | 4 | cnn_lstm_attn | transformer | all_positive | 0.7395 | 0.0360 | 0.6425 | t-1 | t-0 | False |
 
@@ -464,46 +510,46 @@ losing to a constant that predicts no bankruptcy at all.
 
 | horizon | family | n_features | mean_abs_shap | share |
 |---|---|---|---|---|
-| 1 | Distress flag | 1 | 0.01905 | 0.09844 |
-| 1 | Growth | 4 | 0.01091 | 0.22559 |
-| 1 | Leverage | 5 | 0.00803 | 0.20758 |
-| 1 | Cash flow | 4 | 0.00734 | 0.15175 |
-| 1 | Liquidity | 4 | 0.00570 | 0.11779 |
-| 1 | Efficiency | 5 | 0.00523 | 0.13512 |
-| 1 | Profitability | 6 | 0.00205 | 0.06373 |
-| 4 | Cash flow | 4 | 0.08853 | 0.19561 |
-| 4 | Distress flag | 1 | 0.07965 | 0.04400 |
-| 4 | Efficiency | 5 | 0.07437 | 0.20541 |
-| 4 | Liquidity | 4 | 0.07330 | 0.16195 |
-| 4 | Growth | 4 | 0.06161 | 0.13613 |
-| 4 | Leverage | 5 | 0.05987 | 0.16535 |
-| 4 | Profitability | 6 | 0.02762 | 0.09155 |
+| 1 | Distress flag | 1 | 0.01892 | 0.09743 |
+| 1 | Growth | 4 | 0.01118 | 0.23039 |
+| 1 | Leverage | 5 | 0.00788 | 0.20302 |
+| 1 | Cash flow | 4 | 0.00722 | 0.14884 |
+| 1 | Liquidity | 4 | 0.00565 | 0.11642 |
+| 1 | Efficiency | 5 | 0.00537 | 0.13841 |
+| 1 | Profitability | 6 | 0.00212 | 0.06548 |
+| 4 | Cash flow | 4 | 0.08706 | 0.19597 |
+| 4 | Distress flag | 1 | 0.08080 | 0.04547 |
+| 4 | Efficiency | 5 | 0.07281 | 0.20487 |
+| 4 | Liquidity | 4 | 0.07161 | 0.16118 |
+| 4 | Leverage | 5 | 0.05930 | 0.16684 |
+| 4 | Growth | 4 | 0.05865 | 0.13202 |
+| 4 | Profitability | 6 | 0.02773 | 0.09364 |
 
 
 ### Top features
 
 | horizon | rank | feature | family | mean_abs_shap | is_altman | observed_rate |
 |---|---|---|---|---|---|---|
-| 1 | 1 | r22_net_income_growth | Growth | 0.01907 | False | 0.98333 |
-| 1 | 2 | r29_negative_equity_flag | Distress flag | 0.01905 | False | 0.99551 |
-| 1 | 3 | r24_equity_growth | Growth | 0.01859 | False | 0.98077 |
-| 1 | 4 | r15_ltd_to_ta | Leverage | 0.01708 | False | 0.67420 |
-| 1 | 5 | r27_accrual_quality | Cash flow | 0.01161 | False | 0.99968 |
-| 1 | 6 | r16_asset_turnover | Efficiency | 0.01055 | True | 0.99736 |
-| 1 | 7 | r12_debt_to_assets | Leverage | 0.00928 | False | 0.62604 |
-| 1 | 8 | r01_current_ratio | Liquidity | 0.00849 | False | 0.99928 |
-| 1 | 9 | r02_quick_ratio | Liquidity | 0.00743 | False | 0.76875 |
-| 1 | 10 | r26_fcf_to_ta | Cash flow | 0.00702 | False | 0.90921 |
-| 4 | 1 | r25_ocf_to_cl | Cash flow | 0.16507 | False | 0.99826 |
-| 4 | 2 | r01_current_ratio | Liquidity | 0.10389 | False | 0.99859 |
-| 4 | 3 | r19_payables_turnover | Efficiency | 0.09944 | False | 0.72658 |
-| 4 | 4 | r16_asset_turnover | Efficiency | 0.09849 | True | 0.99792 |
-| 4 | 5 | r24_equity_growth | Growth | 0.09847 | False | 0.98081 |
-| 4 | 6 | r22_net_income_growth | Growth | 0.09545 | False | 0.98148 |
-| 4 | 7 | r02_quick_ratio | Liquidity | 0.09301 | False | 0.75658 |
-| 4 | 8 | r14_equity_to_liabilities | Leverage | 0.08391 | True | 0.99550 |
-| 4 | 9 | r29_negative_equity_flag | Distress flag | 0.07965 | False | 0.99550 |
-| 4 | 10 | r03_cash_ratio | Liquidity | 0.07750 | False | 0.92324 |
+| 1 | 1 | r22_net_income_growth | Growth | 0.01996 | False | 0.98333 |
+| 1 | 2 | r29_negative_equity_flag | Distress flag | 0.01892 | False | 0.99551 |
+| 1 | 3 | r24_equity_growth | Growth | 0.01876 | False | 0.98077 |
+| 1 | 4 | r15_ltd_to_ta | Leverage | 0.01714 | False | 0.67420 |
+| 1 | 5 | r27_accrual_quality | Cash flow | 0.01158 | False | 0.99968 |
+| 1 | 6 | r16_asset_turnover | Efficiency | 0.01069 | True | 0.99736 |
+| 1 | 7 | r12_debt_to_assets | Leverage | 0.00857 | False | 0.62604 |
+| 1 | 8 | r01_current_ratio | Liquidity | 0.00851 | False | 0.99928 |
+| 1 | 9 | r02_quick_ratio | Liquidity | 0.00730 | False | 0.76875 |
+| 1 | 10 | r26_fcf_to_ta | Cash flow | 0.00710 | False | 0.90921 |
+| 4 | 1 | r25_ocf_to_cl | Cash flow | 0.16265 | False | 0.99826 |
+| 4 | 2 | r01_current_ratio | Liquidity | 0.10221 | False | 0.99859 |
+| 4 | 3 | r16_asset_turnover | Efficiency | 0.09866 | True | 0.99792 |
+| 4 | 4 | r19_payables_turnover | Efficiency | 0.09765 | False | 0.72658 |
+| 4 | 5 | r24_equity_growth | Growth | 0.09531 | False | 0.98081 |
+| 4 | 6 | r02_quick_ratio | Liquidity | 0.09157 | False | 0.75658 |
+| 4 | 7 | r22_net_income_growth | Growth | 0.09008 | False | 0.98148 |
+| 4 | 8 | r14_equity_to_liabilities | Leverage | 0.08438 | True | 0.99550 |
+| 4 | 9 | r29_negative_equity_flag | Distress flag | 0.08080 | False | 0.99550 |
+| 4 | 10 | r03_cash_ratio | Liquidity | 0.07331 | False | 0.92324 |
 
 
 ## 8. Robustness

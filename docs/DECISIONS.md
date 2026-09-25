@@ -165,3 +165,75 @@ explicitly.
 | 10.8 | **Two model-repo SHAs appear in `results/`, deliberately.** Each `results/runs/*.json` carries the SHA of the code that *trained* that model (`d45fdcc`); `PROVENANCE.json`, `run_all_summary.json` and the report carry the SHA of the code that *assembled the current tables* (`75f3e94`). | A run record must not be rewritten when a downstream table is regenerated — that would claim a training run happened under code it never saw. The two commits differ only in orchestration, reporting and the audit: `models.py`, `train.py`, `data.py`, `classical.py`, `metrics.py`, `imbalance.py`, `tuning.py`, `experiment.py` and `ml_baselines.py` are byte-identical between them (`git diff d45fdcc 75f3e94 -- src/` lists only `phase_d`, `phase_e`, `phase_g`, `leakage`, `report`, `utils` and `run_all.py`), so no reported number depends on which of the two produced it. |
 | 10.9 | Matplotlib is pinned to the **Agg** backend in `src/utils.py`, before anything can import pyplot | On Windows the default is TkAgg, whose Tcl handlers are torn down from the wrong thread at interpreter shutdown. It killed a run with `Tcl_AsyncDelete` *after* 275 models had trained and every figure had been written — the work was complete and the process still exited non-zero. |
 | 10.10 | Rolling-origin CV and the protocol audit cache their result CSVs | Both train through the loop directly rather than through `run_deep`, deliberately, so neither leaves a run record — which also meant neither was resumable. They now cache their own output, so a crash in a later step does not cost a 20-run cross-validation. |
+
+---
+
+## 11. Review fixes and Phase H
+
+A review of the completed pipeline found four correctness problems and several
+gaps. These are the decisions taken in fixing them. Where a fix changed a number
+that had already been reported, `reports/RESULTS.md` carries a "Changes from
+previous run" section listing every number that moved by more than 10%.
+
+### 11.1 Confidence intervals are firm-clustered
+
+| # | Decision | Rationale |
+|---|---|---|
+| 11.1.1 | Every reported interval and p-value is a **firm-clustered bootstrap**: `metrics.cluster_bootstrap_diff` and `cluster_bootstrap_ci` resample CIKs with replacement and take all of a drawn firm's windows | Stride-1 windowing gives one firm up to ~50 overlapping windows that share seven of their eight input quarters and one label-generating event. A window-level bootstrap treats those as independent evidence, so its interval is too narrow. On synthetic data where each group is one row duplicated k times, the cluster interval is ~5x the window interval and the ratio grows with k; both are unit-tested. |
+| 11.1.2 | Window-level intervals are **kept beside** the cluster ones under a `window_level_` prefix rather than deleted | The difference between the two is itself informative about what the independence assumption was buying, and a reader comparing against the previous version of these tables needs to see both. |
+| 11.1.3 | **DeLong is retained**, labelled window-level, with a cluster-bootstrap ROC-AUC interval next to it | DeLong's variance estimator assumes independent observations, which is false here, but it is the test the literature uses and dropping it silently would make comparison against published work harder. Every DeLong and McNemar column name contains `window_level`, and an acceptance test fails if one does not. |
+| 11.1.4 | Both models are scored on the **same** resampled rows in each bootstrap iteration | The interval is then on the paired difference, so it preserves the correlation between the two models' errors as well as the correlation within a firm. |
+
+### 11.2 The protocol audit is no longer base-rate confounded
+
+| # | Decision | Rationale |
+|---|---|---|
+| 11.2.1 | Every audit row carries `pr_auc_lift` = PR-AUC / base rate | PR-AUC is bounded below by the base rate, and the inflated and half-fixed protocols score a SMOTE-balanced test set at ~50% positive against the correct protocol's 0.19%. A raw PR-AUC difference across them measures the base rate at least as much as the leakage. The lift is comparable. |
+| 11.2.2 | Each resampled protocol gains a **`_natural_test` twin**: the same trained model and the same predictions, scored only on the test rows whose SMOTE parent is an original window | This is the comparison that isolates leakage from base-rate inflation, because the twin differs from the correct protocol *only* in how the model was trained. The parent indices come from `imbalance.smote_with_parents`, which is why that function exists. |
+| 11.2.3 | The attribution in `protocol_audit_decomposition.csv` is computed on **ROC-AUC**, with PR-AUC attributed only across the natural-base-rate variants | ROC-AUC is invariant to the base rate, so it can carry an attribution across protocols that score different test sets. PR-AUC can do so only where the base rates match. |
+| 11.2.4 | Accuracy stays in the table as a **diagnostic**, never as the attribution | It is high under the inflated protocol because the model separates a balanced set, and high again under the correct one because the majority class is 99% of it; its two large moves cancel to a net of 0.0018, which is what produced the earlier "8,500% share". |
+| 11.2.5 | Protocol-audit runs now cache their **predictions** under `results/preds_protocol/` | They deliberately break the protocol, so they never go through `run_deep` and leave no run record, which also meant re-scoring them cost two hours of retraining. Caching predictions makes any future change to how the audit is scored a re-read. |
+| 11.2.6 | The same lift column and natural-base-rate twin are added to the UCI external audit | The criticism applies to those datasets for the same reason. |
+
+### 11.3 The decomposition ladder walks one change at a time
+
+| # | Decision | Rationale |
+|---|---|---|
+| 11.3.1 | The ladder is now A_zdp to B_levels to B_tensor to **B_mlp_t0** to C_lstm to D_lstm | The old B_levels to C_lstm step changed four things at once: linear to nonlinear, static to sequential, annualised panel levels to z-scored quarterly tensor ratios, and a single fit to a five-seed ensemble. It credited all of it to "the static formulation". Each new rung differs from the one below it in exactly one respect: B_tensor is preprocessing, B_mlp_t0 is nonlinearity, C_lstm is the time axis. |
+| 11.3.2 | `B_mlp_t0` is an MLP (64-32-16, widths mirroring the recurrent heads) on the five Altman ratios at t-0, trained through the same loop with class weights, early stopping on val PR-AUC and five seeds | Reusing the training loop means the rung inherits the identical imbalance treatment and stopping rule, so the comparison with C_lstm is about the time axis and nothing else. Matching the head widths keeps it from being a capacity comparison in disguise. |
+| 11.3.3 | A t-0 slice is expressed as an `(n, 1, F)` tensor rather than a 2-D matrix | Every model, the training loop, the caching layer and the leakage audit then work unchanged; only the time axis is removed. |
+| 11.3.4 | `B_xgb_t0` and `C_xgb` repeat the same question with gradient boosting, in a side table | If the time axis is what pays, it should pay without a neural network in the comparison. Same tuning budget, same row set. |
+| 11.3.5 | The MLP is tuned in its **own** study file per input shape (`mlp_t0_altman5.json`, `mlp_t0_all29.json`) rather than under the bare architecture name | The same architecture appears at two input widths; one shared study would apply a configuration tuned on five inputs to twenty-nine. |
+| 11.3.6 | Significance is stated **per horizon**, in `decomposition_significance.csv` and in the summary | A step that clears zero at h=4, with 363 test positives, need not clear it at h=1 with 60. The earlier summary generalised from h=4. |
+
+### 11.4 Both aggregation conventions are always reported
+
+| # | Decision | Rationale |
+|---|---|---|
+| 11.4.1 | Every deep table carries `<metric>_mean` / `<metric>_std` (per-seed) **and** `<metric>_ensemble` (the metric of the seed-averaged prediction), plus an `aggregation_note` column | The two disagree - LSTM h=4 PR-AUC is 0.039 per-seed and 0.047 as an ensemble - and reporting one in `deep_4.csv` while the decomposition used the other is what made the same model appear twice with different numbers. An acceptance test fails if a table carries only one convention, or if the two are identical, which would mean one of them is not real. |
+| 11.4.2 | The ensemble is the convention the significance tests use; the per-seed mean is the one that shows seed sensitivity | A test needs a single prediction vector, and averaging five seeds is the standard way to get one. The per-seed spread is what says whether a difference is bigger than seed noise. |
+| 11.4.3 | Rungs in the decomposition declare their own convention in an `aggregation` column | Half the ladder is a single deterministic fit and half is a five-seed ensemble; the column says which. |
+
+### 11.5 Phase H
+
+| # | Decision | Rationale |
+|---|---|---|
+| 11.5.1 | **H1** compares XGBoost on 29 ratios at t-0 (plus the two indicators) against the existing Phase B XGBoost on the flattened window (232 + 2) | The pipeline had no control isolating the time axis *for the winning model*. Model B to C answers it for Altman's five variables under an LSTM; nothing answered it for the model that actually scores highest. The two differ in the time axis and nothing else. |
+| 11.5.2 | **H2** adds a static MLP on all 29 ratios at t-0 | Without it, "the LSTM beats logistic regression" cannot distinguish the time axis from the nonlinearity. |
+| 11.5.3 | **H3** reports firm-clustered intervals on XGBoost vs Transformer, XGBoost vs C_lstm, Transformer vs LSTM, XGBoost vs LSTM and Transformer vs C_lstm, at every horizon | The headline architecture table previously reported means with no test attached; the decomposition ladder was the only place anything was tested. |
+| 11.5.4 | **H4** reports precision@k and recall@k at k in {50, 100, 200, top 1%, top 5%}, at window level **and at firm level** (a firm enters once, at its highest-scored window) | F1 at a tuned threshold means little to a credit officer, and PR-AUC 0.15 reads as failure until top-decile capture sits beside it. The firm view is the one that matches the decision actually being made. |
+| 11.5.5 | **H5** uses **quantile** calibration bins, and squashes non-probability scores through a standardised logistic before asking about calibration | At a ~1% base rate uniform bins put almost every row in the first bin. Altman, Ohlson and Zmijewski emit scores rather than probabilities; the squash is monotone, so it leaves every ranking metric untouched, and any model scored this way is flagged `is_probability = False`. |
+| 11.5.6 | **H6** cuts size terciles on **train-period** total assets | The test split must not inform its own grouping. |
+| 11.5.7 | A sector or size cell with fewer than **20 test positives** reports `too few` rather than a number | A PR-AUC on five positives is noise with a decimal point. The threshold is stated in `h6_breakdown_notes.json` and enforced by an acceptance test. |
+
+### 11.6 Statements corrected
+
+| # | Decision | Rationale |
+|---|---|---|
+| 11.6.1 | A to B is described as "PR-AUC flat, ROC-AUC significantly worse at the longer horizons", not "worth nothing" | Both are true and only the pair is honest: on the ranking metric the refit is actively worse, which "nothing" conceals. |
+| 11.6.2 | A **distribution-shift diagnostic** refits B on train + val and re-scores test | If the training period were simply unrepresentative, moving the fit two years closer to the test window should recover part of the ROC-AUC drop. It is a diagnostic only: nothing fitted on val scores a headline number, and its predictions are never written into a reported table. |
+| 11.6.3 | `interpretability_summary.md` is regenerated by **re-reading the CSVs it just wrote** | The prose and the table then cannot drift apart, which is the only way "every rho matches the CSV" can be guaranteed rather than asserted. |
+| 11.6.4 | The interpretability summary states that Spearman over 8 quarters has very low power | With n = 8, an absolute rho of 0.74 is needed to reach p < 0.05 at all. The argmax agreement is the more robust reading and is reported beside it. |
+| 11.6.5 | The imbalance narrative in `RESULTS.md` is generated **per architecture** from the ablation CSV | The untreated baseline is not the same number across architectures or horizons, and quoting one of them as if it were general was the error. |
+| 11.6.6 | The paper title becomes *Beyond the Z-Score: Decomposing the Failure of Static Bankruptcy Formulas with Sequence Models*; the registered capstone title is noted and kept | The results do not support a temporal-deep-learning framing: gradient boosting on the flattened window has the highest PR-AUC of any model here. The README headline now says so first. |
+| 11.6.7 | `reports/RESULTS.md` opens with a **"Changes from previous run"** section, diffing every watched number against a snapshot of the previous build | A pipeline whose numbers move after a correctness fix should say which ones moved and by how much, rather than quietly presenting the new set. The snapshot lives in `results/results_snapshot.json`. |

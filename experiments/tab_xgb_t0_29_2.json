@@ -1,0 +1,24 @@
+{
+  "key": "xgb_t0_29_2",
+  "model": "xgboost",
+  "horizon": 2,
+  "seed": 0,
+  "feature_cols": null,
+  "t0_only": true,
+  "with_indicators": true,
+  "n_inputs": 31,
+  "n_features": 31,
+  "n_trials": 30,
+  "best": {
+    "n_estimators": 600,
+    "max_depth": 7,
+    "learning_rate": 0.0760433261794055,
+    "subsample": 1.0,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 5.0
+  },
+  "note": "29 ratios at t-0 plus the two indicators; no time axis",
+  "models_sha": "85c3df3",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-25T03:41:41"
+}

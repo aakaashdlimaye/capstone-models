@@ -4,7 +4,7 @@ The dataset repository proved its own four checks in
 `reports/leakage_audit_full.md`.  This file proves the four the modelling
 stage is responsible for.  Every claim prints the output it rests on.
 
-Dataset repo SHA `b16eb17`, models repo SHA `75f3e94`.
+Dataset repo SHA `b16eb17`, models repo SHA `85c3df3`.
 
 ## (a) no window index appears in more than one split in any result file
 
@@ -13,7 +13,7 @@ row_sets.csv rows                        : 139,652
 distinct (cik, end_quarter) window keys  : 139,652
 window keys mapped to >1 split           : 0
 split sizes                              : {'test': 32216, 'train': 86592, 'val': 20844}
-prediction files checked                 : 654
+prediction files checked                 : 758
 files containing a row from another split: 0
 ```
 
@@ -23,7 +23,7 @@ files containing a row from another split: 0
 
 ```
 train split size                         : 86,592
-class-weight runs inspected              : 155
+class-weight runs inspected              : 195
 SMOTE runs inspected                     : 40
 runs whose statistics do not come from train only : 0
 
@@ -58,10 +58,10 @@ reaches any reported table other than results/protocol_audit*.csv.
 ## (c) the final test evaluation was executed exactly once per model
 
 ```
-run records on disk                      : 275
-distinct run keys                        : 275
+run records on disk                      : 315
+distinct run keys                        : 315
 keys with more than one record           : 0
-test prediction files                    : 327
+test prediction files                    : 379
 test prediction files per key (max)      : 1
 
 One run key = one test prediction file.  `run_deep` writes the file once and
@@ -74,7 +74,7 @@ downstream table reads that same file rather than re-running the model.
 ## (d) all five seeds used identical split membership
 
 ```
-multi-seed run families checked          : 55
+multi-seed run families checked          : 63
 families whose seeds saw different rows  : 0
 
 example families (row count and positive count identical across seeds):

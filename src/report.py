@@ -71,6 +71,44 @@ def compute_time() -> tuple[float, int]:
     return total, n
 
 
+def imbalance_narrative(t: pd.DataFrame, horizon: int) -> list[str]:
+    """The ablation read out of its own table, per architecture.
+
+    Written from the CSV rather than by hand: the untreated baseline differs by
+    architecture and by horizon, and quoting one of them as if it were general
+    was how the earlier narrative went wrong.
+    """
+    out = ["Read from `imbalance_ablation_h%d.csv`, per architecture, because the "
+           "untreated baseline is not the same number across architectures:" % horizon, ""]
+    for arch in sorted(t["arch"].unique()):
+        g = t[t["arch"] == arch].set_index("treatment")
+        if "none" not in g.index:
+            continue
+        base = g.loc["none", "pr_auc_mean"]
+        train_side = [x for x in C.TREATMENTS if x != "none" and x in g.index]
+        if not train_side:
+            continue
+        best_t = max(train_side, key=lambda x: g.loc[x, "pr_auc_mean"])
+        best_v = g.loc[best_t, "pr_auc_mean"]
+        hurt = [x for x in train_side if g.loc[x, "pr_auc_mean"] < base]
+        cost_rows = [x for x in g.index if str(x).startswith("cost_threshold")]
+        best_cost = min(list(g.index), key=lambda x: g.loc[x, "cost_1to50_mean"])             if "cost_1to50_mean" in g.columns else None
+        line = (f"- **{arch}**: untreated PR-AUC {base:.4f}; best training-side treatment "
+                f"is {best_t} at {best_v:.4f} ({best_v - base:+.4f})")
+        if hurt:
+            line += f"; {', '.join(hurt)} reduce it"
+        if best_cost is not None:
+            line += (f".  Lowest expected cost at 50:1 comes from `{best_cost}` "
+                     f"({g.loc[best_cost, 'cost_1to50_mean']:.4f})")
+        out.append(line + ".")
+    if any(str(x).startswith("cost_threshold") for x in t["treatment"].unique()):
+        out += ["",
+                "The `cost_threshold_*` rows share the untreated model's ranking and differ "
+                "only in where it is cut, so their PR-AUC is identical to `none` by "
+                "construction; they move expected cost, not PR-AUC."]
+    return out
+
+
 def provenance_manifest() -> Path:
     """One record per produced artefact, stamped with both repositories' SHAs.
 
@@ -97,6 +135,85 @@ def provenance_manifest() -> Path:
     return out
 
 
+SNAPSHOT = "results_snapshot.json"
+WATCHED = {
+    "deep_all.csv": ["arch", "horizon"],
+    "baselines_all.csv": ["model", "horizon"],
+    "protocol_audit.csv": ["horizon", "protocol"],
+    "decomposition_all.csv": ["horizon", "model"],
+    "rolling_origin.csv": ["model", "fold"],
+    "imbalance_ablation_all.csv": ["horizon", "arch", "treatment"],
+}
+CHANGE_THRESHOLD = 0.10       # relative
+
+
+def _snapshot() -> dict:
+    """Every watched metric, keyed so the next run can diff against it."""
+    snap = {}
+    for fname, keys in WATCHED.items():
+        path = C.RESULTS / fname
+        if not path.exists():
+            continue
+        df = pd.read_csv(path)
+        if not set(keys) <= set(df.columns):
+            continue
+        num = [c for c in df.columns
+               if pd.api.types.is_numeric_dtype(df[c]) and c not in keys]
+        for _, r in df.iterrows():
+            rid = " / ".join(str(r[k]) for k in keys)
+            for c in num:
+                v = r[c]
+                if pd.notna(v):
+                    snap[f"{fname}::{rid}::{c}"] = float(v)
+    return snap
+
+
+def changes_section() -> list[str]:
+    """Numbers that moved more than 10% relative since the last report build."""
+    path = C.RESULTS / SNAPSHOT
+    new = _snapshot()
+    old = {}
+    if path.exists():
+        try:
+            old = json.loads(path.read_text(encoding="utf-8")).get("values", {})
+        except Exception:
+            old = {}
+
+    moved, added = [], 0
+    for k, v in new.items():
+        if k not in old:
+            added += 1
+            continue
+        o = old[k]
+        denom = max(abs(o), 1e-9)
+        rel = abs(v - o) / denom
+        if rel > CHANGE_THRESHOLD and abs(v - o) > 1e-6:
+            f, rid, col = k.split("::", 2)
+            moved.append({"file": f, "row": rid, "metric": col,
+                          "old": o, "new": v, "rel_change": rel})
+    U.write_json(path, {"values": new, **U.provenance()})
+
+    if not old:
+        return ["## Changes from previous run", "",
+                "No previous snapshot on disk, so there is nothing to compare against.",
+                f"This run recorded {len(new):,} numbers as the baseline for next time."]
+
+    L = ["## Changes from previous run", "",
+         f"Every watched number whose relative change exceeded "
+         f"{CHANGE_THRESHOLD:.0%}, old against new.  "
+         f"{len(new):,} numbers watched, {added:,} newly added this run."]
+    if not moved:
+        L += ["", "Nothing moved by more than the threshold."]
+        return L
+    df = pd.DataFrame(moved).sort_values("rel_change", ascending=False)
+    L += ["", f"**{len(df)} numbers moved.**", "",
+          U.to_markdown(df.head(60), floatfmt="%.4f")]
+    if len(df) > 60:
+        L += ["", f"_({len(df) - 60} further changes omitted; the full set is in "
+                  f"`{SNAPSHOT}` against the previous build.)_"]
+    return L
+
+
 def build(full: bool = True) -> Path:
     MISSING.clear()
     prov = U.provenance()
@@ -117,6 +234,9 @@ def build(full: bool = True) -> Path:
     secs, nruns = compute_time()
     A(f"- Total measured compute: **{secs / 3600:.2f} h** over {nruns} cached deep runs "
       f"plus the logged tuning trials.")
+    A("")
+    for line in changes_section():
+        A(line)
     A("")
     A("Read PR-AUC first.  At a window-level positive rate of roughly 1% (0.18% at")
     A("h=1) ROC-AUC flatters every model, which is exactly the point Contribution 5")
@@ -249,6 +369,9 @@ def build(full: bool = True) -> Path:
         A("cut, which shows up in expected cost rather than in PR-AUC:")
         A("")
         A(f"![cost heatmap h={h}](../results/figures/imbalance_cost_heatmap_h{h}.png)")
+        A("")
+        for line in imbalance_narrative(t, h):
+            A(line)
         A("")
 
     # ---------------------------------------------------------------- 5
