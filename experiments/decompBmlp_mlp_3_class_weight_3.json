@@ -1,0 +1,50 @@
+{
+  "key": "decompBmlp_mlp_3_class_weight_3",
+  "arch": "mlp",
+  "horizon": 3,
+  "treatment": "class_weight",
+  "seed": 3,
+  "tag": "decompBmlp",
+  "note": "B_mlp_t0: Altman's five ratios at t-0, static MLP",
+  "feature_cols": [
+    3,
+    9,
+    8,
+    13,
+    15
+  ],
+  "feature_names": [
+    "r04_wc_to_ta",
+    "r10_re_to_ta",
+    "r09_ebit_to_ta",
+    "r14_equity_to_liabilities",
+    "r16_asset_turnover"
+  ],
+  "want_attention": false,
+  "hparams": {
+    "lr": 0.0028744152094248555,
+    "batch_size": 64,
+    "dropout": 0.3,
+    "weight_decay": 0.0,
+    "grad_clip": 1.0,
+    "max_epochs": 60,
+    "patience": 10,
+    "arch_kwargs": {}
+  },
+  "data": {
+    "n_train": 86592,
+    "n_val": 20844,
+    "n_test": 32216,
+    "n_features": 5,
+    "n_steps": 1,
+    "with_indicators": false,
+    "t0_only": true
+  },
+  "early_stopping": {
+    "monitor": "validation PR-AUC",
+    "patience": 10
+  },
+  "models_sha": "85c3df3",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-25T04:33:17"
+}

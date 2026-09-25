@@ -67,7 +67,7 @@ class DataBundle:
 def bundle(splits: dict[str, D.SplitData], horizon: int | str = 4,
            feature_cols: list[int] | None = None,
            row_mask: dict[str, np.ndarray] | None = None,
-           with_indicators: bool = False) -> DataBundle:
+           with_indicators: bool = False, t0_only: bool = False) -> DataBundle:
     """Assemble a run's arrays from the loaded splits."""
     sel = {}
     for name in ("train", "val", "test"):
@@ -80,6 +80,10 @@ def bundle(splits: dict[str, D.SplitData], horizon: int | str = 4,
         x = d.features(feature_cols)
         if with_indicators:
             x = np.concatenate([x, d.indicators], axis=2)
+        if t0_only:
+            # Keep the (n, T, F) rank with T = 1 so every model and the whole
+            # training loop work unchanged; only the time axis is removed.
+            x = x[:, -1:, :]
         return np.ascontiguousarray(x)
 
     def yof(d):
@@ -93,7 +97,8 @@ def bundle(splits: dict[str, D.SplitData], horizon: int | str = 4,
         test_index=sel["test"].frame()[["cik", "end_quarter"]].reset_index(drop=True),
         meta={"n_train": sel["train"].n, "n_val": sel["val"].n, "n_test": sel["test"].n,
               "n_features": Xof(sel["train"]).shape[2],
-              "with_indicators": with_indicators},
+              "n_steps": Xof(sel["train"]).shape[1],
+              "with_indicators": with_indicators, "t0_only": t0_only},
     )
 
 
@@ -117,6 +122,7 @@ def load_model(key: str, n_features: int | None = None, n_out: int = 1):
     n_features = n_features or rec["data"]["n_features"]
     hp = rec["hparams"]
     model = Models.build(rec["arch"], n_features=n_features, n_out=n_out,
+                         n_steps=rec["data"].get("n_steps", C.WINDOW_LEN),
                          dropout=hp.get("dropout", 0.3), **hp.get("arch_kwargs", {}))
     model.load_state_dict(torch.load(weights_path(key), map_location="cpu"))
     model.eval()
@@ -248,10 +254,53 @@ def score(key: str, horizon_col: str = "", thr_rule: str = "f1",
     return out
 
 
+# --------------------------------------------------------------------------
+# Two aggregation conventions, always reported side by side
+# --------------------------------------------------------------------------
+# A 5-seed family can be summarised two ways and they do not agree:
+#   per_seed  — compute the metric for each seed, then average (mean +/- std)
+#   ensemble  — average the five predicted probabilities, then compute once
+# The ensemble is usually the better model and is what the decomposition's
+# statistical tests need (they take one prediction vector); the per-seed mean is
+# what shows seed sensitivity.  Reporting only one of them was what made the
+# LSTM h=4 PR-AUC read as 0.039 in one table and 0.047 in another.  Every table
+# now carries both, with the convention named in the column.
+def ensemble_predictions(keys: list[str], split: str = "test", horizon_col: str = ""):
+    """Seed-averaged probability for a family of runs, on one split."""
+    frames = [load_preds(k, split) for k in keys]
+    P = np.column_stack([f[f"p_hat{horizon_col}"].to_numpy() for f in frames])
+    y = frames[0][f"y_true{horizon_col}"].to_numpy().astype(int)
+    return y, P.mean(axis=1), frames[0]
+
+
+def ensemble_score(keys: list[str], horizon_col: str = "", thr_rule: str = "f1",
+                   fn_cost: float = 1.0, cost_ratios=C.COST_RATIOS) -> dict:
+    """Score the seed-averaged prediction, threshold still chosen on val."""
+    yv, pv, _ = ensemble_predictions(keys, "val", horizon_col)
+    yt, pt, _ = ensemble_predictions(keys, "test", horizon_col)
+    if thr_rule == "f1":
+        thr, _ = M.best_f1_threshold(yv, pv)
+    elif thr_rule == "cost":
+        thr, _ = M.best_cost_threshold(yv, pv, fn_cost=fn_cost)
+    else:
+        thr = float(thr_rule)
+    out = {"n_seeds_in_ensemble": len(keys), "aggregation": "ensemble"}
+    out.update({f"val_{k}": v for k, v in M.evaluate(yv, pv).items()
+                if k in ("roc_auc", "pr_auc")})
+    out.update(M.evaluate(yt, pt, thr=thr, cost_ratios=cost_ratios))
+    return out
+
+
 def summarise(records: list[dict], scores: list[dict], by: list[str],
               metrics: tuple[str, ...] = ("roc_auc", "pr_auc", "f1", "recall",
-                                          "specificity", "precision", "accuracy")) -> pd.DataFrame:
-    """Mean +/- std across seeds, which is how every deep number is reported."""
+                                          "specificity", "precision", "accuracy"),
+              horizon_col: str = "") -> pd.DataFrame:
+    """Per-seed mean +/- std **and** the seed-ensemble metric, in named columns.
+
+    `<metric>_mean` / `<metric>_std` are the per-seed convention;
+    `<metric>_ensemble` is the metric of the seed-averaged prediction.  See the
+    note above for why both are always present.
+    """
     df = pd.DataFrame(scores)
     meta = pd.DataFrame(records)[["key", *[c for c in by if c in pd.DataFrame(records).columns],
                                   "n_params", "epochs_run", "seconds"]]
@@ -270,4 +319,26 @@ def summarise(records: list[dict], scores: list[dict], by: list[str],
     agg["epochs_mean"] = ("epochs_run", "mean")
     agg["seconds_total"] = ("seconds", "sum")
     out = df.groupby(by, dropna=False).agg(**agg).reset_index()
+
+    # The ensemble convention, computed from the same cached predictions.
+    ens_rows = []
+    for gvals, g in df.groupby(by, dropna=False):
+        keys = sorted(g["key"].tolist())
+        row = dict(zip(by, gvals if isinstance(gvals, tuple) else (gvals,)))
+        try:
+            es = ensemble_score(keys, horizon_col=horizon_col)
+        except Exception as exc:                       # a family missing a file
+            row["ensemble_error"] = str(exc)
+            ens_rows.append(row)
+            continue
+        for m in metrics:
+            if m in es:
+                row[f"{m}_ensemble"] = es[m]
+        for c in es:
+            if c.startswith("cost_1to"):
+                row[f"{c}_ensemble"] = es[c]
+        ens_rows.append(row)
+    out = out.merge(pd.DataFrame(ens_rows), on=by, how="left")
+    out["aggregation_note"] = ("_mean/_std = per-seed metrics averaged; "
+                               "_ensemble = metric of the seed-averaged prediction")
     return out

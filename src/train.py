@@ -130,7 +130,8 @@ def train_one(
     Xte_t = _to_device(Xte, device)
 
     model = Models.build(arch, n_features=Xtr.shape[2], n_out=n_out,
-                         dropout=hp.dropout, **hp.arch_kwargs).to(device)
+                         n_steps=Xtr.shape[1], dropout=hp.dropout,
+                         **hp.arch_kwargs).to(device)
     opt = torch.optim.Adam(model.parameters(), lr=hp.lr, weight_decay=hp.weight_decay)
 
     # Early stopping watches validation PR-AUC.  With 37 positives at h=1 the

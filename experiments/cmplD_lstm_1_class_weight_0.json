@@ -24,13 +24,15 @@
     "n_val": 19673,
     "n_test": 30678,
     "n_features": 29,
-    "with_indicators": false
+    "n_steps": 8,
+    "with_indicators": false,
+    "t0_only": false
   },
   "early_stopping": {
     "monitor": "validation PR-AUC",
     "patience": 10
   },
-  "models_sha": "75f3e94",
+  "models_sha": "85c3df3",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-18T17:20:14"
+  "timestamp": "2026-09-25T05:48:00"
 }

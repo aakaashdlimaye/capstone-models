@@ -86,12 +86,20 @@ def test_every_decomposition_step_has_delong_and_mcnemar():
     d = _read("decomposition_all.csv")
     steps = d[d["step"].notna()]
     assert len(steps) > 0
-    for col in ("delong_roc_diff", "delong_ci_low", "delong_ci_high", "delong_p",
-                "pr_auc_diff", "pr_ci_low", "pr_ci_high",
-                "mcnemar_b", "mcnemar_c", "mcnemar_p"):
+    # DeLong and McNemar are still reported, now explicitly labelled window-level
+    # because both assume independent rows; the primary intervals are the
+    # firm-clustered ones checked in tests/test_acceptance_review.py.
+    for col in ("delong_window_level_diff", "delong_window_level_ci_low",
+                "delong_window_level_ci_high", "delong_window_level_p",
+                "pr_auc_diff", "pr_auc_cluster_ci_low", "pr_auc_cluster_ci_high",
+                "mcnemar_window_level_b", "mcnemar_window_level_c",
+                "mcnemar_window_level_p"):
+        assert col in steps.columns, f"{col} missing"
         assert steps[col].notna().all(), f"{col} has gaps"
-    assert (steps["delong_ci_low"] <= steps["delong_roc_diff"]).all()
-    assert (steps["delong_roc_diff"] <= steps["delong_ci_high"]).all()
+    assert (steps["delong_window_level_ci_low"]
+            <= steps["delong_window_level_diff"] + 1e-9).all()
+    assert (steps["delong_window_level_diff"]
+            <= steps["delong_window_level_ci_high"] + 1e-9).all()
 
 
 # --- 4. ablation and protocol audit, with the >95% row --------------------
@@ -125,17 +133,25 @@ def test_protocol_audit_decomposition_is_bounded():
 
 # --- 5. the decomposition states its share sentence -----------------------
 def test_decomposition_summary_states_the_shares_with_numbers():
+    from src.phase_e import CAUSE, PRIMARY_LADDER
+
     txt = (C.RESULTS / "decomposition_summary.md").read_text(encoding="utf-8")
-    assert "coefficient drift" in txt
-    assert "the static formulation" in txt
-    assert "the feature-set expansion" in txt
+    # The old ladder called B->C "the static formulation" and credited four
+    # simultaneous changes to it; it is now split into preprocessing,
+    # nonlinearity and the time axis, each its own rung.
+    for cause in ("coefficient drift", "nonlinearity", "the time axis",
+                  "the feature-set expansion"):
+        assert cause in txt, f"summary does not name {cause!r}"
     for h in C.HORIZONS:
         assert f"At h={h}, test PR-AUC moves from" in txt
+
     s = _read("decomposition_shares.csv")
+    steps = [f"{PRIMARY_LADDER[i - 1]}->{PRIMARY_LADDER[i]}"
+             for i in range(1, len(PRIMARY_LADDER))]
+    assert set(steps) <= set(CAUSE), "a ladder step has no stated cause"
     for h in C.HORIZONS:
         row = s[s["horizon"] == h].iloc[0]
-        shares = [row[f"pr_auc_share_{k}"] for k in
-                  ("A_zdp->B_levels", "B_levels->C_lstm", "C_lstm->D_lstm")]
+        shares = [row[f"pr_auc_share_{k}"] for k in steps]
         assert all(0 <= v <= 1 for v in shares), f"h={h} shares outside [0, 1]: {shares}"
         assert np.isclose(sum(shares), 1.0), f"h={h} shares do not sum to 1"
 

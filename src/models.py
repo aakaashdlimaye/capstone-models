@@ -186,11 +186,45 @@ class CNNLSTMAttnNet(nn.Module):
 
 
 # --------------------------------------------------------------------------
+# --------------------------------------------------------------------------
+# 5. MLP — the control that separates "deep" from "temporal"
+# --------------------------------------------------------------------------
+class MLPNet(nn.Module):
+    """Feed-forward net over the flattened input, with no time modelling at all.
+
+    Fed a single-quarter tensor (T = 1) this is a static nonlinear classifier,
+    which is what isolates the LSTM's nonlinearity from its time axis: without
+    it, B (linear, static) -> C (nonlinear, sequential) cannot say which of the
+    two changes did the work.  Fed the full 8-quarter tensor it becomes the
+    flattened-window control instead.
+
+    Widths mirror the recurrent heads (64 -> 32 -> 16) so the comparison is not
+    a capacity comparison in disguise.
+    """
+
+    name = "mlp"
+
+    def __init__(self, n_features: int = 29, n_out: int = 1, n_steps: int = 1,
+                 hidden: tuple[int, ...] = (64, 32, 16), dropout: float = 0.3):
+        super().__init__()
+        self.n_steps = n_steps
+        dims = [n_features * n_steps, *hidden]
+        layers: list[nn.Module] = []
+        for a, b in zip(dims[:-1], dims[1:]):
+            layers += [nn.Linear(a, b), nn.ReLU(), nn.Dropout(dropout)]
+        self.body = nn.Sequential(*layers)
+        self.out = nn.Linear(dims[-1], n_out)
+
+    def forward(self, x):
+        return self.out(self.body(x.flatten(start_dim=1))), None
+
+
 REGISTRY = {
     "lstm": LSTMNet,
     "bilstm": BiLSTMNet,
     "transformer": TransformerNet,
     "cnn_lstm_attn": CNNLSTMAttnNet,
+    "mlp": MLPNet,
 }
 
 HAS_ATTENTION = {"transformer", "cnn_lstm_attn"}
@@ -199,6 +233,8 @@ HAS_ATTENTION = {"transformer", "cnn_lstm_attn"}
 def build(name: str, n_features: int = 29, n_out: int = 1, **kwargs) -> nn.Module:
     if name not in REGISTRY:
         raise KeyError(f"unknown architecture {name!r}; have {sorted(REGISTRY)}")
+    if name != "mlp":
+        kwargs.pop("n_steps", None)     # only the MLP flattens, so only it needs this
     return REGISTRY[name](n_features=n_features, n_out=n_out, **kwargs)
 
 

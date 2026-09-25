@@ -1,0 +1,30 @@
+{
+  "key": "decompB_xgb_t0_4",
+  "model": "xgboost",
+  "horizon": 4,
+  "seed": 0,
+  "feature_cols": [
+    3,
+    9,
+    8,
+    13,
+    15
+  ],
+  "t0_only": true,
+  "with_indicators": false,
+  "n_inputs": 5,
+  "n_features": 5,
+  "n_trials": 30,
+  "best": {
+    "n_estimators": 600,
+    "max_depth": 7,
+    "learning_rate": 0.020198945998003114,
+    "subsample": 1.0,
+    "colsample_bytree": 1.0,
+    "min_child_weight": 5.0
+  },
+  "note": "Altman's five ratios at t-0 only",
+  "models_sha": "85c3df3",
+  "dataset_sha": "b16eb17",
+  "timestamp": "2026-09-25T02:20:45"
+}

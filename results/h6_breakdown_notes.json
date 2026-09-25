@@ -1,0 +1,7 @@
+{
+  "train_asset_tercile_cuts": [
+    189904666.66666663,
+    2023877333.333333
+  ],
+  "min_test_positives_to_report": 20
+}

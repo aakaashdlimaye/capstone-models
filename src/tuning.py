@@ -113,6 +113,19 @@ def tune(arch: str, b, n_trials: int = C.TUNING_TRIALS, force: bool = False,
     return out
 
 
+def best_hparams_at(path, max_epochs: int | None = None,
+                    patience: int | None = None) -> T.HParams:
+    """The tuned configuration from a named study file.
+
+    An architecture can appear at more than one input shape (the MLP runs on
+    five ratios at t-0 for the decomposition and on twenty-nine for Phase H), so
+    those studies live in their own files rather than under the bare arch name.
+    """
+    cfg = json.loads(path.read_text(encoding="utf-8"))["best"] if path.exists()         else dict(SPEC_DEFAULTS)
+    return T.HParams(max_epochs=max_epochs if max_epochs is not None else C.MAX_EPOCHS,
+                     patience=patience if patience is not None else C.PATIENCE, **cfg)
+
+
 def best_hparams(arch: str, max_epochs: int | None = None,
                  patience: int | None = None) -> T.HParams:
     """The tuned configuration, or the spec defaults if tuning has not run.

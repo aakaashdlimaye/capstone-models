@@ -257,3 +257,219 @@ def bootstrap_diff(y: np.ndarray, p1: np.ndarray, p2: np.ndarray,
     pval = float(min(1.0, 2 * frac))
     return {"diff": float(obs), "ci_low": float(lo), "ci_high": float(hi),
             "p_value": pval, "n_boot": n_boot}
+
+
+# --------------------------------------------------------------------------
+# Cluster bootstrap — the honest interval when rows are not independent
+# --------------------------------------------------------------------------
+# Stride-1 windowing gives one firm up to ~50 overlapping windows that share
+# seven of their eight input quarters and one label-generating event.  A
+# bootstrap that resamples windows treats those as independent evidence and
+# returns an interval that is too narrow.  Resampling *firms*, and taking all of
+# a drawn firm's windows, keeps the within-firm correlation intact.  These are
+# the intervals the paper reports; the window-level ones are kept beside them.
+
+
+def _group_index(groups: np.ndarray) -> tuple[np.ndarray, list[np.ndarray]]:
+    """Unique group labels, and for each the row positions belonging to it."""
+    g = np.asarray(groups)
+    order = np.argsort(g, kind="mergesort")
+    gs = g[order]
+    starts = np.flatnonzero(np.r_[True, gs[1:] != gs[:-1]])
+    bounds = np.r_[starts, len(gs)]
+    uniq = gs[starts]
+    members = [order[bounds[i]:bounds[i + 1]] for i in range(len(uniq))]
+    return uniq, members
+
+
+def _cluster_resample(members: list[np.ndarray], rng: np.random.Generator) -> np.ndarray:
+    pick = rng.integers(0, len(members), size=len(members))
+    return np.concatenate([members[i] for i in pick])
+
+
+def cluster_bootstrap_ci(y: np.ndarray, p: np.ndarray, groups: np.ndarray,
+                         stat=pr_auc, n_boot: int = 2000, seed: int = 0,
+                         alpha: float = 0.05) -> dict:
+    """Firm-clustered bootstrap CI on a single model's statistic."""
+    y = np.asarray(y).astype(int)
+    p = np.asarray(p, dtype=float)
+    obs = stat(y, p)
+    _, members = _group_index(groups)
+    rng = np.random.default_rng(seed)
+    vals = np.full(n_boot, np.nan)
+    for b in range(n_boot):
+        idx = _cluster_resample(members, rng)
+        yb = y[idx]
+        if yb.sum() == 0 or yb.sum() == len(yb):
+            continue
+        vals[b] = stat(yb, p[idx])
+    ok = np.isfinite(vals)
+    if ok.sum() < 50:
+        return {"value": float(obs), "ci_low": float("nan"), "ci_high": float("nan"),
+                "n_boot": int(ok.sum()), "n_clusters": len(members), "level": "cluster"}
+    lo, hi = np.percentile(vals[ok], [100 * alpha / 2, 100 * (1 - alpha / 2)])
+    return {"value": float(obs), "ci_low": float(lo), "ci_high": float(hi),
+            "n_boot": int(ok.sum()), "n_clusters": len(members), "level": "cluster"}
+
+
+def cluster_bootstrap_diff(y: np.ndarray, p1: np.ndarray, p2: np.ndarray,
+                           groups: np.ndarray, stat=pr_auc, n_boot: int = 2000,
+                           seed: int = 0, alpha: float = 0.05) -> dict:
+    """Firm-clustered bootstrap CI and two-sided p on stat(p2) - stat(p1).
+
+    Both models are scored on the same resampled rows each iteration, so the
+    interval is on the paired difference and preserves both the correlation
+    between the two models' errors and the correlation within a firm.
+    """
+    y = np.asarray(y).astype(int)
+    p1 = np.asarray(p1, dtype=float); p2 = np.asarray(p2, dtype=float)
+    obs = stat(y, p2) - stat(y, p1)
+    _, members = _group_index(groups)
+    rng = np.random.default_rng(seed)
+    diffs = np.full(n_boot, np.nan)
+    for b in range(n_boot):
+        idx = _cluster_resample(members, rng)
+        yb = y[idx]
+        if yb.sum() == 0 or yb.sum() == len(yb):
+            continue
+        diffs[b] = stat(yb, p2[idx]) - stat(yb, p1[idx])
+    ok = np.isfinite(diffs)
+    if ok.sum() < 50:
+        return {"diff": float(obs), "ci_low": float("nan"), "ci_high": float("nan"),
+                "p_value": float("nan"), "n_boot": int(ok.sum()),
+                "n_clusters": len(members), "level": "cluster"}
+    d = diffs[ok]
+    lo, hi = np.percentile(d, [100 * alpha / 2, 100 * (1 - alpha / 2)])
+    frac = float(np.mean(d <= 0)) if obs > 0 else float(np.mean(d >= 0))
+    return {"diff": float(obs), "ci_low": float(lo), "ci_high": float(hi),
+            "p_value": float(min(1.0, 2 * frac)), "n_boot": int(ok.sum()),
+            "n_clusters": len(members), "level": "cluster"}
+
+
+def compare(y: np.ndarray, p1: np.ndarray, p2: np.ndarray, groups: np.ndarray,
+            thr1: float | None = None, thr2: float | None = None,
+            n_boot: int = 2000, seed: int = 0) -> dict:
+    """The full comparison the paper reports for any two models on one row set.
+
+    Cluster-bootstrap intervals are primary.  DeLong and McNemar assume
+    independent rows, so they are carried beside them under `window_level_`
+    names rather than dropped: the difference between the two is itself
+    informative about how much the independence assumption buys.
+    """
+    out = {}
+    for name, stat in (("pr_auc", pr_auc), ("roc_auc", roc_auc)):
+        cb = cluster_bootstrap_diff(y, p1, p2, groups, stat=stat, n_boot=n_boot, seed=seed)
+        out[f"{name}_diff"] = cb["diff"]
+        out[f"{name}_cluster_ci_low"] = cb["ci_low"]
+        out[f"{name}_cluster_ci_high"] = cb["ci_high"]
+        out[f"{name}_cluster_p"] = cb["p_value"]
+        wb = bootstrap_diff(y, p1, p2, stat=stat, n_boot=n_boot, seed=seed)
+        out[f"{name}_window_level_ci_low"] = wb["ci_low"]
+        out[f"{name}_window_level_ci_high"] = wb["ci_high"]
+    out["n_clusters"] = int(len(np.unique(groups)))
+    dl = delong_test(y, p1, p2)
+    out.update({"delong_window_level_diff": dl["diff"],
+                "delong_window_level_ci_low": dl["ci_low"],
+                "delong_window_level_ci_high": dl["ci_high"],
+                "delong_window_level_p": dl["p_value"]})
+    if thr1 is not None and thr2 is not None:
+        mc = mcnemar_test(y, p1, p2, thr1, thr2)
+        out.update({"mcnemar_window_level_b": mc["b"], "mcnemar_window_level_c": mc["c"],
+                    "mcnemar_window_level_p": mc["p_value"]})
+    return out
+
+
+# --------------------------------------------------------------------------
+# Practitioner metrics (Phase H)
+# --------------------------------------------------------------------------
+def precision_at_k(y: np.ndarray, p: np.ndarray, k: int) -> dict:
+    """Precision, recall and lift among the k highest-scored rows."""
+    y = np.asarray(y).astype(int)
+    p = np.asarray(p, dtype=float)
+    n, total_pos = len(y), int(y.sum())
+    k = int(min(max(k, 0), n))
+    if k == 0 or total_pos == 0:
+        return {"k": k, "tp": 0, "precision": float("nan"), "recall": 0.0,
+                "lift": float("nan")}
+    top = np.argpartition(-p, k - 1)[:k]
+    tp = int(y[top].sum())
+    base = total_pos / n
+    return {"k": k, "tp": tp, "precision": tp / k, "recall": tp / total_pos,
+            "lift": (tp / k) / base if base else float("nan")}
+
+
+def firm_level_scores(y: np.ndarray, p: np.ndarray, groups: np.ndarray
+                      ) -> tuple[np.ndarray, np.ndarray]:
+    """Collapse windows to firms: each firm's highest score, and whether it ever fails.
+
+    A credit officer decides about a firm, not about a window, so this is the
+    view that matches the decision actually being made.
+    """
+    y = np.asarray(y).astype(int)
+    p = np.asarray(p, dtype=float)
+    _, members = _group_index(groups)
+    fy = np.array([int(y[m].max()) for m in members])
+    fp = np.array([float(p[m].max()) for m in members])
+    return fy, fp
+
+
+def capture_curve(y: np.ndarray, p: np.ndarray, n_points: int = 100):
+    """Cumulative share of positives captured as the alarm budget grows."""
+    import pandas as pd
+
+    y = np.asarray(y).astype(int)
+    order = np.argsort(-np.asarray(p, dtype=float))
+    ys = y[order]
+    total = max(int(ys.sum()), 1)
+    cum = np.cumsum(ys) / total
+    frac = np.arange(1, len(ys) + 1) / len(ys)
+    take = np.unique(np.linspace(0, len(ys) - 1, n_points).astype(int))
+    return pd.DataFrame({"frac_flagged": frac[take], "frac_captured": cum[take]})
+
+
+def logistic_scale(p: np.ndarray) -> np.ndarray:
+    """Squash an unbounded score into (0, 1) so it can be asked about calibration.
+
+    Altman, Ohlson and Zmijewski emit scores, not probabilities; a reliability
+    curve on a raw Z is meaningless.  Standardising and passing through a
+    logistic is monotone, so it leaves every ranking metric untouched and only
+    puts the score on an axis where "predicted 3% and 3% failed" is a statement.
+    Any model scored this way is flagged `is_probability = False`.
+    """
+    p = np.asarray(p, dtype=float)
+    sd = p.std()
+    z = (p - p.mean()) / (sd if sd > 0 else 1.0)
+    return 1.0 / (1.0 + np.exp(-np.clip(z, -500, 500)))
+
+
+def calibration(y: np.ndarray, p: np.ndarray, n_bins: int = 10,
+                strategy: str = "quantile"):
+    """Reliability table plus Brier score and expected calibration error.
+
+    Quantile bins, because at a ~1% base rate uniform bins put almost every row
+    into the first bin and the curve says nothing.
+    """
+    import pandas as pd
+
+    y = np.asarray(y).astype(int)
+    p = np.asarray(p, dtype=float)
+    if strategy == "quantile":
+        edges = np.unique(np.quantile(p, np.linspace(0, 1, n_bins + 1)))
+    else:
+        edges = np.linspace(p.min(), p.max(), n_bins + 1)
+    if len(edges) < 3:
+        edges = np.array([p.min(), float(np.median(p)), p.max() + 1e-12])
+    idx = np.clip(np.digitize(p, edges[1:-1], right=True), 0, len(edges) - 2)
+
+    rows, ece, n = [], 0.0, len(y)
+    for b in range(len(edges) - 1):
+        m = idx == b
+        if not m.any():
+            continue
+        conf, obs = float(p[m].mean()), float(y[m].mean())
+        rows.append({"bin": b, "n": int(m.sum()), "mean_predicted": conf,
+                     "observed_rate": obs, "gap": obs - conf})
+        ece += (m.sum() / n) * abs(obs - conf)
+    return pd.DataFrame(rows), {"brier": float(np.mean((p - y) ** 2)),
+                                "ece": float(ece), "n_bins_used": len(rows),
+                                "strategy": strategy}

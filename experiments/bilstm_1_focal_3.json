@@ -30,7 +30,7 @@
     "monitor": "validation PR-AUC",
     "patience": 10
   },
-  "models_sha": "75f3e94",
+  "models_sha": "85c3df3",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-18T17:10:36"
+  "timestamp": "2026-09-25T00:51:17"
 }

@@ -337,12 +337,27 @@ def main(full: bool = True, horizons=(1, 4), seeds=C.SEEDS,
     xc = pd.DataFrame(xchecks)
     U.write_table(xc, C.RESULTS / "interpretability_crosscheck", floatfmt="%.4f")
 
-    write_summary(attn, fams, feats, xc, metas, best_arch, horizons)
+    # The summary re-reads the CSVs it just wrote rather than the in-memory
+    # frames, so every rho and p in the prose is by construction the number in
+    # interpretability_crosscheck.csv and cannot drift from it.
+    write_summary(pd.read_csv(C.RESULTS / "attention_by_quarter.csv"),
+                  pd.read_csv(C.RESULTS / "shap_family_importance.csv"),
+                  pd.read_csv(C.RESULTS / "shap_feature_importance.csv"),
+                  pd.read_csv(C.RESULTS / "interpretability_crosscheck.csv"),
+                  metas, best_arch, horizons)
     return {"best_arch": best_arch, "n_crosschecks": len(xc)}
 
 
 def write_summary(attn, fams, feats, xc, metas, best_arch, horizons) -> None:
     L = ["# Interpretability summary", "",
+         "Every number in this file is read back from the CSVs in `results/`, not from",
+         "the run that produced them, so the prose cannot drift from the tables.", "",
+         "**On the rank correlations below.**  They are computed over eight quarters, so",
+         "they have very little power: with n = 8, Spearman needs |rho| >= 0.74 to reach",
+         "p < 0.05 at all, and a single quarter changing rank moves rho materially.  They",
+         "are reported because agreement between two independent methods is worth having,",
+         "not because any one of them is decisive on its own.  The argmax agreement in the",
+         "last column is the more robust reading.", "",
          f"SHAP model: **{best_arch}** (best mean test PR-AUC at h=4). "
          f"Estimator: {metas[0]['explainer']}, "
          f"{metas[0]['n_background']} background windows, "

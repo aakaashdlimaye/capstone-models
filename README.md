@@ -1,7 +1,17 @@
 # capstone-models
 
-Modelling and evaluation for *"Bankruptcy Prediction using Temporal Deep
-Learning: A Comparative Study of LSTM and Transformer Models."*
+Modelling and evaluation for
+
+> **Beyond the Z-Score: Decomposing the Failure of Static Bankruptcy Formulas
+> with Sequence Models**
+
+The capstone was registered as *"Bankruptcy Prediction using Temporal Deep
+Learning: A Comparative Study of LSTM and Transformer Models"*, and that remains
+its title for the university. The paper title changed because the results did
+not support the original framing: a gradient-boosted tree on the flattened
+window outperforms all four temporal architectures, so the contribution is the
+decomposition and the methodological audit rather than a win for sequence
+models. See §9.
 
 This repository consumes the frozen dataset in
 [`capstone-dataset`](https://github.com/aakaashdlimaye/bankruptcy-prediction-dataset)
@@ -72,7 +82,7 @@ Useful variants:
 python run_all.py --pilot          # smoke run on the 18k-window pilot tensors
 python run_all.py --pilot --quick  # wiring check only, a few minutes
 python run_all.py --from d         # resume from a phase
-python run_all.py --only f report  # rebuild interpretability and the report
+python run_all.py --only h report  # rebuild Phase H and the report
 python run_all.py --force          # ignore cached runs and retrain
 python -m pytest tests/ -q         # 71 unit tests
 ```
@@ -97,6 +107,7 @@ so the whole pipeline finishes in about half an hour; `--pilot --seeds 5
 | **E** | The A→B→C→D decomposition with DeLong CIs and McNemar tests, plus the all-complete-subset check | — |
 | **F** | Attention over quarters and SHAP family × quarter importance, masked, cross-checked | — |
 | **G** | Rolling-origin CV, the embargo split, external validation on UCI Taiwanese and Polish | — |
+| **H** | The missing controls (XGBoost at t-0 vs the window; a static MLP), pairwise firm-clustered significance, precision@k and capture curves, calibration, and size/sector breakdowns | — |
 | **audit** | The four-check leakage audit with printed evidence | All four checks pass |
 | **report** | Generates `reports/RESULTS.md` from the CSVs | — |
 
@@ -117,7 +128,8 @@ src/
   train.py         the single training loop
   experiment.py    run-and-cache, scoring, seed aggregation
   tuning.py        the deep random search
-  phase_{a..g}.py  one module per phase
+  tabular.py       cached tabular models on any slice of the tensor
+  phase_{a..h}.py  one module per phase
   leakage.py       the four-check audit
   report.py        RESULTS.md generation
 experiments/       one JSON config per run: what it was asked to do, before it ran
@@ -225,14 +237,25 @@ fewer windows each. Two consequences:
 Headline numbers from the artefacts in `results/`. Every one is traceable to a
 CSV and a seed; see `reports/RESULTS.md` for the full tables.
 
-**The Transformer wins, and it is the only architecture that holds up as the
-horizon lengthens.** Test PR-AUC at h=4: Transformer 0.069 ± 0.012, CNN-LSTM-Attn
-0.044 ± 0.006, LSTM 0.039 ± 0.009, Bi-LSTM 0.035 ± 0.007, against Altman Z″'s
-0.031. Across h=1…4 the Transformer stays in 0.069–0.079 while the others decay.
+**A tuned XGBoost on the flattened window has the highest PR-AUC of any model
+here** — 0.149 at h=4, against the best neural model's 0.069. Gradient boosting
+on 232 flattened ratio-quarters beats all four temporal architectures by roughly
+2×, on the same row set, the same split and the same 30-trial tuning budget.
+That is the headline, and it is why the paper is framed around the decomposition
+rather than around sequence models winning.
 
-**A tuned XGBoost on the flattened window beats all four** (PR-AUC 0.149 at h=4).
-Reported as found. It does not touch the decomposition, which is a question about
-temporal structure and feature sets rather than a leaderboard.
+**Among the temporal architectures the Transformer is best**, and the only one
+that does not decay as the horizon lengthens: test PR-AUC at h=4 is Transformer
+0.069 ± 0.012, CNN-LSTM-Attn 0.044 ± 0.006, LSTM 0.039 ± 0.009, Bi-LSTM
+0.035 ± 0.007, against Altman Z″'s 0.031. Across h=1…4 the Transformer stays in
+0.069–0.079 while the others fall away. Phase H reports firm-clustered intervals
+on every one of those comparisons, so the ordering can be read with its
+uncertainty rather than as a ranking.
+
+Numbers quoted here are the **per-seed mean ± std**. Every table also carries
+the **seed-ensemble** value (the metric of the averaged prediction), which is
+the higher of the two and is what the significance tests use. Both conventions
+are named in every column; see `docs/DECISIONS.md` 4.x.
 
 **The decomposition answers its question, and the answer is not the expected
 one.** At h=4, of the total movement from Altman Z″ to a full temporal model,

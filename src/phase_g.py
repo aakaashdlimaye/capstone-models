@@ -237,32 +237,50 @@ def external_protocol(X, y, name: str, seeds=C.SEEDS, n_trials: int = C.TUNING_T
         rows.append(r)
 
     # --- the protocol audit, on the datasets the inflated literature uses ----
+    # Same base-rate correction as the main audit: the inflated protocol scores
+    # a SMOTE-balanced test set, so its PR-AUC is not comparable with the
+    # correct protocol's.  Every row carries `pr_auc_lift` (PR-AUC / base rate),
+    # and the inflated protocol also gets a `_natural_test` twin -- the same
+    # model and the same predictions, scored only on the rows that are real
+    # firms rather than interpolated ones.
     audit = []
+
+    def row(tag, yy, pp, thr, seed, note):
+        base = float(yy.mean())
+        pra = M.pr_auc(yy, pp)
+        return {"dataset": name, "protocol": tag, "seed": seed,
+                "n_test": len(yy), "test_positive_rate": base,
+                **{k: M.threshold_metrics(yy, pp, thr)[k]
+                   for k in ("accuracy", "f1", "recall", "specificity")},
+                "roc_auc": M.roc_auc(yy, pp), "pr_auc": pra,
+                "pr_auc_lift": pra / base if base > 0 else np.nan,
+                "scored_on": note}
+
+    n_orig = len(y)
     for seed in seeds:
         Xs, ys, parent, _ = IMB.smote_with_parents(X[:, None, :], y, seed=seed)
         Xs = Xs[:, 0, :]
+        orig_id = np.arange(len(ys))
         # Inflated: SMOTE first, then a random split, accuracy at 0.5.
-        a_tr, a_te, b_tr, b_te = train_test_split(Xs, ys, test_size=0.2,
-                                                  random_state=seed, stratify=ys)
+        a_tr, a_te, b_tr, b_te, _, id_te = train_test_split(
+            Xs, ys, orig_id, test_size=0.2, random_state=seed, stratify=ys)
         est = ML.make_estimator("random_forest", ML.DEFAULTS["random_forest"], 1.0, seed=seed)
         est.fit(a_tr, b_tr)
         p = ML.predict_proba(est, a_te)
-        audit.append({"dataset": name, "protocol": "inflated", "seed": seed,
-                      "n_test": len(b_te), "test_positive_rate": float(b_te.mean()),
-                      **{k: M.threshold_metrics(b_te, p, 0.5)[k]
-                         for k in ("accuracy", "f1", "recall", "specificity")},
-                      "roc_auc": M.roc_auc(b_te, p), "pr_auc": M.pr_auc(b_te, p)})
+        audit.append(row("inflated", b_te, p, 0.5, seed,
+                         "test set as the protocol leaves it"))
+        nat = id_te < n_orig
+        if nat.sum() and 0 < b_te[nat].sum() < nat.sum():
+            audit.append(row("inflated_natural_test", b_te[nat], p[nat], 0.5, seed,
+                             "real rows only, at the natural base rate"))
         # Correct: split first, resample inside train only, threshold on val.
         Xr, yr, _ = IMB.smote_sequences(Xtr[:, None, :], ytr, seed=seed)
         est = ML.make_estimator("random_forest", ML.DEFAULTS["random_forest"], 1.0, seed=seed)
         est.fit(Xr[:, 0, :], yr)
         pv, pt = ML.predict_proba(est, Xva), ML.predict_proba(est, Xte)
         thr, _ = M.best_f1_threshold(yva, pv)
-        audit.append({"dataset": name, "protocol": "correct", "seed": seed,
-                      "n_test": len(yte), "test_positive_rate": float(yte.mean()),
-                      **{k: M.threshold_metrics(yte, pt, thr)[k]
-                         for k in ("accuracy", "f1", "recall", "specificity")},
-                      "roc_auc": M.roc_auc(yte, pt), "pr_auc": M.pr_auc(yte, pt)})
+        audit.append(row("correct", yte, pt, thr, seed,
+                         "the natural test set"))
     return pd.DataFrame(rows), pd.DataFrame(audit)
 
 
@@ -304,7 +322,9 @@ def main(full: bool = True, seeds=C.SEEDS, n_trials: int = C.TUNING_TRIALS,
     auds = (aud.groupby(["dataset", "protocol"])
             .agg(accuracy_mean=("accuracy", "mean"), accuracy_std=("accuracy", "std"),
                  pr_auc_mean=("pr_auc", "mean"), pr_auc_std=("pr_auc", "std"),
-                 roc_auc_mean=("roc_auc", "mean"), recall_mean=("recall", "mean"),
+                 pr_auc_lift_mean=("pr_auc_lift", "mean"),
+                 roc_auc_mean=("roc_auc", "mean"), roc_auc_std=("roc_auc", "std"),
+                 recall_mean=("recall", "mean"),
                  test_positive_rate=("test_positive_rate", "mean"),
                  n_seeds=("seed", "count")).reset_index())
     U.write_table(auds, C.RESULTS / "external_protocol_audit")
