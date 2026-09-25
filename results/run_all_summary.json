@@ -55,7 +55,7 @@
     4
   ],
   "tuning_trials": 30,
-  "wall_seconds_total": 22211.12867569996,
+  "wall_seconds_total": 22213.075449799973,
   "invocations": [
     {
       "phases": [
@@ -209,9 +209,26 @@
       "models_sha": "5a5a82c",
       "dataset_sha": "b16eb17",
       "timestamp": "2026-09-25T21:01:32"
+    },
+    {
+      "phases": [
+        "report"
+      ],
+      "wall_seconds": 1.9467741000116803,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "tuning_trials": 30,
+      "models_sha": "bc4604e",
+      "dataset_sha": "b16eb17",
+      "timestamp": "2026-09-25T21:32:27"
     }
   ],
-  "models_sha": "5a5a82c",
+  "models_sha": "bc4604e",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-25T21:01:32"
+  "timestamp": "2026-09-25T21:32:27"
 }

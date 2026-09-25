@@ -3675,7 +3675,7 @@
     "imbalance_ablation_all.csv::4 / transformer / smote::cost_1to50_mean": 0.5468400794636206,
     "imbalance_ablation_all.csv::4 / transformer / smote::cost_1to50_std": 0.0138720373465063
   },
-  "models_sha": "5a5a82c",
+  "models_sha": "bc4604e",
   "dataset_sha": "b16eb17",
-  "timestamp": "2026-09-25T21:01:31"
+  "timestamp": "2026-09-25T21:32:26"
 }

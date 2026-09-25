@@ -5,73 +5,16 @@ No number in this file is typed by hand.
 
 - Universe: **full**
 - Dataset repository SHA: `b16eb17`
-- Models repository SHA: `5a5a82c`
+- Models repository SHA: `bc4604e`
 - Seeds: `[0, 1, 2, 3, 4]`; deep results are mean ± std over 5 seeds unless stated otherwise.
-- Generated: 2026-09-25T21:01:31
+- Generated: 2026-09-25T21:32:26
 - Total measured compute: **14.90 h** over 315 cached deep runs plus the logged tuning trials.
 
 ## Changes from previous run
 
-Every watched number whose relative change exceeded 10%, old against new.  3,674 numbers watched, 240 newly added this run.
+Every watched number whose relative change exceeded 10%, old against new.  3,674 numbers watched, 0 newly added this run.
 
-**53 numbers moved.**
-
-| file | row | metric | old | new | rel_change |
-|---|---|---|---|---|---|
-| baselines_all.csv | svm_rbf / 3 | alarm_rate | 0.0142 | 0.0298 | 1.1007 |
-| baselines_all.csv | stacking / 1 | alarm_rate | 0.0012 | 0.0021 | 0.7692 |
-| baselines_all.csv | svm_rbf / 3 | cost_1to1 | 0.0190 | 0.0331 | 0.7447 |
-| baselines_all.csv | random_forest / 1 | alarm_rate | 0.0016 | 0.0026 | 0.6346 |
-| baselines_all.csv | random_forest / 4 | alarm_rate | 0.0056 | 0.0088 | 0.5659 |
-| baselines_all.csv | random_forest / 3 | alarm_rate | 0.0061 | 0.0094 | 0.5590 |
-| baselines_all.csv | stacking / 1 | recall | 0.1333 | 0.2000 | 0.5000 |
-| baselines_all.csv | random_forest / 4 | recall | 0.0937 | 0.1405 | 0.5000 |
-| baselines_all.csv | svm_rbf / 4 | alarm_rate | 0.0213 | 0.0108 | 0.4934 |
-| baselines_all.csv | svm_rbf / 3 | recall | 0.2038 | 0.2962 | 0.4528 |
-| baselines_all.csv | random_forest / 1 | recall | 0.1667 | 0.2333 | 0.4000 |
-| baselines_all.csv | svm_rbf / 2 | brier | 0.2074 | 0.1302 | 0.3719 |
-| baselines_all.csv | svm_rbf / 4 | recall | 0.1543 | 0.0992 | 0.3571 |
-| baselines_all.csv | svm_rbf / 1 | brier | 0.0540 | 0.0732 | 0.3556 |
-| baselines_all.csv | random_forest / 3 | recall | 0.1269 | 0.1692 | 0.3333 |
-| baselines_all.csv | svm_rbf / 4 | cost_1to1 | 0.0291 | 0.0198 | 0.3188 |
-| baselines_all.csv | svm_rbf / 3 | precision | 0.1160 | 0.0802 | 0.3084 |
-| baselines_all.csv | random_forest / 1 | cost_1to1 | 0.0029 | 0.0036 | 0.2717 |
-| baselines_all.csv | svm_rbf / 4 | precision | 0.0815 | 0.1034 | 0.2691 |
-| baselines_all.csv | stacking / 1 | cost_1to1 | 0.0026 | 0.0033 | 0.2651 |
-| baselines_all.csv | svm_rbf / 4 | brier | 0.0915 | 0.1156 | 0.2627 |
-| baselines_all.csv | random_forest / 4 | f1 | 0.1248 | 0.1574 | 0.2616 |
-| baselines_all.csv | svm_rbf / 2 | alarm_rate | 0.0315 | 0.0395 | 0.2532 |
-| baselines_all.csv | xgboost / 3 | alarm_rate | 0.0063 | 0.0079 | 0.2512 |
-| baselines_all.csv | svm_rbf / 2 | pr_auc | 0.0370 | 0.0463 | 0.2494 |
-| baselines_all.csv | svm_rbf / 2 | cost_1to1 | 0.0332 | 0.0408 | 0.2269 |
-| baselines_all.csv | random_forest / 3 | cost_1to1 | 0.0121 | 0.0148 | 0.2237 |
-| baselines_all.csv | svm_rbf / 4 | pr_auc | 0.0467 | 0.0558 | 0.1959 |
-| baselines_all.csv | xgboost / 4 | alarm_rate | 0.0047 | 0.0038 | 0.1867 |
-| baselines_all.csv | stacking / 2 | brier | 0.1390 | 0.1132 | 0.1853 |
-| baselines_all.csv | svm_rbf / 4 | val_pr_auc | 0.0393 | 0.0464 | 0.1821 |
-| baselines_all.csv | stacking / 3 | alarm_rate | 0.0057 | 0.0047 | 0.1730 |
-| baselines_all.csv | stacking / 2 | recall | 0.1139 | 0.1329 | 0.1667 |
-| baselines_all.csv | stacking / 1 | precision | 0.2051 | 0.1739 | 0.1522 |
-| baselines_all.csv | stacking / 1 | f1 | 0.1616 | 0.1860 | 0.1512 |
-| baselines_all.csv | svm_rbf / 3 | f1 | 0.1478 | 0.1262 | 0.1462 |
-| baselines_all.csv | random_forest / 3 | precision | 0.1692 | 0.1447 | 0.1447 |
-| baselines_all.csv | random_forest / 4 | cost_1to1 | 0.0148 | 0.0169 | 0.1447 |
-| baselines_all.csv | random_forest / 1 | precision | 0.1923 | 0.1647 | 0.1435 |
-| baselines_all.csv | stacking / 3 | recall | 0.1385 | 0.1192 | 0.1389 |
-| baselines_all.csv | svm_rbf / 2 | recall | 0.3228 | 0.3671 | 0.1373 |
-| baselines_all.csv | xgboost / 1 | pr_auc | 0.1406 | 0.1595 | 0.1340 |
-| baselines_all.csv | svm_rbf / 3 | pr_auc | 0.0609 | 0.0687 | 0.1289 |
-| baselines_all.csv | xgboost / 3 | precision | 0.2167 | 0.1890 | 0.1281 |
-| baselines_all.csv | xgboost / 1 | val_pr_auc | 0.2499 | 0.2186 | 0.1253 |
-| baselines_all.csv | stacking / 2 | alarm_rate | 0.0032 | 0.0036 | 0.1250 |
-| baselines_all.csv | svm_rbf / 3 | brier | 0.1820 | 0.1595 | 0.1239 |
-| baselines_all.csv | xgboost / 2 | alarm_rate | 0.0038 | 0.0043 | 0.1220 |
-| baselines_all.csv | xgboost / 3 | cost_1to1 | 0.0116 | 0.0130 | 0.1147 |
-| baselines_all.csv | random_forest / 2 | alarm_rate | 0.0046 | 0.0052 | 0.1141 |
-| baselines_all.csv | stacking / 2 | f1 | 0.1374 | 0.1527 | 0.1115 |
-| baselines_all.csv | xgboost / 4 | recall | 0.1019 | 0.0909 | 0.1081 |
-| baselines_all.csv | stacking / 1 | brier | 0.0871 | 0.0963 | 0.1047 |
-
+Nothing moved by more than the threshold.
 
 Read PR-AUC first.  At a window-level positive rate of roughly 1% (0.18% at
 h=1) ROC-AUC flatters every model, which is exactly the point Contribution 5

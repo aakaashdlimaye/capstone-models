@@ -7,17 +7,29 @@ Modelling and evaluation for
 
 The capstone was registered as *"Bankruptcy Prediction using Temporal Deep
 Learning: A Comparative Study of LSTM and Transformer Models"*, and that remains
-its title for the university. The paper title changed because the results did
-not support the original framing: a gradient-boosted tree on the flattened
-window outperforms all four temporal architectures, so the contribution is the
+its title for the university.
+
+The paper title changed because a gradient-boosted tree on the flattened window
+has the highest PR-AUC of any model here, so the contribution is the
 decomposition and the methodological audit rather than a win for sequence
-models. See §9.
+models.
+
+**That framing has an open question against it.** Phase H1b found the
+eight-quarter window's contribution is *masked* rather than absent: four of the
+29 ratios are year-on-year growth, so a single end-quarter row already carries
+four quarters of history. Drop them and the window becomes significant at three
+of the four horizons, where it was significant at none with them present; and on
+Altman's five ratios, which contain no growth ratio, the window helps
+significantly at every horizon. "Temporal structure does not help here" is
+therefore too strong a reading of the headline table. See §9 and
+`results/h1b_growth_ratio_explanation.csv`.
 
 This repository consumes the frozen dataset in
 [`capstone-dataset`](https://github.com/aakaashdlimaye/bankruptcy-prediction-dataset)
 and produces every table and figure the paper needs: classical baselines, four
 temporal architectures, the imbalance ablation, the protocol audit, the
-decomposition experiment, interpretability, and the robustness checks.
+decomposition experiment, interpretability, the robustness checks, and the
+controls and practitioner metrics in Phase H.
 
 Nothing here writes to the dataset repository. It is read-only input.
 
@@ -31,6 +43,7 @@ Nothing here writes to the dataset repository. It is read-only input.
 | 3 — decomposition of classical-formula failure into coefficient drift, static formulation and feature-set limitation | `results/decomposition_{h}.csv`, `results/decomposition_summary.md` |
 | 4 — period-level interpretability, validated by two independent methods | `results/figures/attention_by_quarter.*`, `results/figures/shap_family_by_quarter.*`, `results/interpretability_summary.md` |
 | 5 — methodological audit of the reported 91–99% accuracies | `results/protocol_audit.csv`, `results/imbalance_ablation_h{1,4}.csv`, `results/external_protocol_audit.csv` |
+| Controls and practitioner metrics (Phase H) — does history help the best model, and what does a credit officer get? | `results/h1_temporal_control.csv`, `results/h1b_growth_ratio_explanation.csv`, `results/h4_precision_at_k.csv`, `results/h5_calibration.csv` |
 
 Contribution 1 (the dataset itself) is delivered by the other repository.
 
@@ -84,7 +97,7 @@ python run_all.py --pilot --quick  # wiring check only, a few minutes
 python run_all.py --from d         # resume from a phase
 python run_all.py --only h report  # rebuild Phase H and the report
 python run_all.py --force          # ignore cached runs and retrain
-python -m pytest tests/ -q         # 71 unit tests
+python -m pytest tests/ -q         # 113 tests
 ```
 
 `--pilot` writes to `results_pilot/` and `reports_pilot/`. The pilot is
@@ -107,7 +120,7 @@ so the whole pipeline finishes in about half an hour; `--pilot --seeds 5
 | **E** | The A→B→C→D decomposition with DeLong CIs and McNemar tests, plus the all-complete-subset check | — |
 | **F** | Attention over quarters and SHAP family × quarter importance, masked, cross-checked | — |
 | **G** | Rolling-origin CV, the embargo split, external validation on UCI Taiwanese and Polish | — |
-| **H** | The missing controls (XGBoost at t-0 vs the window; a static MLP), pairwise firm-clustered significance, precision@k and capture curves, calibration, and size/sector breakdowns | — |
+| **H** | H1 the temporal control for the winning model and H1b the growth-ratio explanation for it; H2 a static MLP separating deep from temporal; H3 pairwise firm-clustered significance; H4 precision@k and capture curves at window and firm level; H5 calibration; H6 size and sector breakdowns | — |
 | **audit** | The four-check leakage audit with printed evidence | All four checks pass |
 | **report** | Generates `reports/RESULTS.md` from the CSVs | — |
 
@@ -120,7 +133,8 @@ src/
   config.py        paths, the 29 feature names, families, Altman indices, protocol constants
   data.py          the loader, its assertions, the row-set contract, the embargo mask
   utils.py         seeding, git SHAs, table and figure writers
-  metrics.py       ROC/PR-AUC, thresholded metrics, expected cost, DeLong, McNemar, bootstrap
+  metrics.py       ROC/PR-AUC, expected cost, DeLong, McNemar, cluster bootstrap,
+                   precision@k, capture curves, calibration, Platt scaling
   classical.py     annualisation, Altman Z''/Z', Ohlson, Zmijewski, coefficient re-estimation
   ml_baselines.py  the five ML baselines and their random search
   models.py        the four architectures in PyTorch, with attention exposed
@@ -137,7 +151,8 @@ results/           tables (CSV + Markdown), figures (PNG + SVG), predictions, ru
 models/            saved weights (gitignored)
 reports/           RESULTS.md, leakage_audit.md
 docs/DECISIONS.md  every judgment call, with its rationale
-tests/             71 unit tests, including the nine acceptance criteria
+tests/             113 tests: unit tests, the nine acceptance criteria,
+                   and invariants on the artefacts themselves
 ```
 
 ---
@@ -169,6 +184,17 @@ tests/             71 unit tests, including the nine acceptance criteria
 | `attention_by_quarter.csv` | Mean attention per quarter, per architecture, per group, with the observed fraction it was masked against |
 | `shap_family_importance.csv`, `shap_feature_importance.csv`, `shap_family_by_quarter_h{1,4}.csv` | \|SHAP\| by family, by feature, and on the family × quarter grid |
 | `interpretability_crosscheck.csv`, `interpretability_summary.md` | Spearman and Kendall agreement between attention and SHAP |
+| `decomposition_significance.csv` | Each ladder step at each horizon, stated separately: does its firm-clustered interval exclude zero? |
+| `decomposition_tree_ladder.csv`, `decomposition_tree_ladder_tests.csv` | The same time-axis question walked by gradient boosting instead of a neural net, five seeds a rung, with a clustered CI on the difference |
+| `decomposition_drift_diagnostic.csv` | Does refitting Altman's coefficients on train+val recover the ROC-AUC drop? (It does not; the table carries the verdict.) |
+| `h1_temporal_control.csv` | XGBoost on 29 ratios at t-0 against the same learner on the flattened window — the control for whether history helps the best model |
+| `h1b_growth_ratio_explanation.csv` | The same comparison with the four year-on-year growth ratios removed, which is what explains H1 |
+| `h2_static_deep_control.csv` | A static MLP on 29 ratios at t-0, separating "deep" from "temporal" |
+| `h3_pairwise_significance.csv` | Every headline architecture pair with firm-clustered intervals, DeLong and McNemar beside them as window-level |
+| `h4_precision_at_k.csv`, `h4_capture_curves.csv` | Of the k riskiest, how many fail — at window level and at firm level |
+| `h5_calibration.csv`, `h5_calibration_bins.csv` | Reliability, Brier and ECE; scores that are not probabilities are Platt-scaled on validation first |
+| `h6_size_breakdown.csv`, `h6_sector_breakdown.csv`, `h6_breakdown_notes.json` | PR-AUC by total-assets tercile and by 2-digit SIC, reporting "too few" below 20 test positives |
+| `results_snapshot.json` | Every watched metric from the previous report build; the "Changes from previous run" section diffs against it |
 | `rolling_origin.csv`, `rolling_origin_runs.csv` | PR-AUC per expanding fold for the best deep model and Altman Z″ |
 | `embargo.csv` | The stricter, boundary-free split against the standard one |
 | `external_validation.csv`, `external_protocol_audit.csv` | UCI Taiwanese and Polish under the same protocol, and the protocol audit repeated there |
@@ -192,7 +218,8 @@ or `decompC_lstm_1_class_weight_0`.
 
 `results/figures/` — `attention_by_quarter`, `shap_family_by_quarter`,
 `shap_family_by_quarter_h{1,4}`, `decomposition_pr_h{1,2,3,4}`,
-`imbalance_heatmap_h{1,4}`. Each as both `.png` and `.svg`.
+`imbalance_heatmap_h{1,4}`, `imbalance_cost_heatmap_h{1,4}`,
+`capture_curves_{firm,window}`, `calibration`. Each as both `.png` and `.svg`.
 
 ---
 
@@ -327,10 +354,13 @@ Measured on one NVIDIA T1000 8GB, Windows 11, PyTorch 2.14 + CUDA 12.6.
 
 | | |
 |---|---:|
-| Total measured compute, full universe | **13.7 h** |
-| Cached deep runs | 275 |
-| Full pipeline on the pilot, every gate | 29.8 min |
-| Unit tests (71, incl. 15 acceptance checks) | ~3 min |
+| Total measured compute, full universe | **14.9 h** |
+| Cached deep runs | 315 |
+| Tests (113, incl. 32 acceptance checks) | ~4 min |
+
+The pilot reproduction last measured **29.8 min**, before Phase H and the
+round-2 additions; it has not been re-timed since, and the firm-clustered
+bootstraps will have made it longer. `python run_all.py --pilot` re-measures it.
 
 `reports/RESULTS.md` prints the total measured compute across all cached runs
 and tuning trials, and `results/PROVENANCE.json` lists every artefact with its
@@ -340,4 +370,11 @@ The models are small — 31k to 71k parameters — and the binding cost is kerne
 launch overhead across roughly 2,700 optimiser steps per epoch at batch 32, not
 arithmetic. Larger batch sizes are in the search space for exactly that reason;
 the Transformer's search nevertheless chose batch 32, which is why it accounts
-for more than half the total compute on its own.
+for more than half the training compute on its own.
+
+Since the review fixes, the **firm-clustered bootstraps** are the other large
+cost: Phase E spends roughly 30 minutes per horizon on them, because each of
+~76,000 metric evaluations per horizon has to rebuild a resampled index from
+~3,400 per-firm arrays. `metrics._cluster_resample` would vectorise well if that
+becomes a problem; it has not been optimised because it is a speed issue rather
+than a correctness one.
